@@ -8,8 +8,8 @@ import java.io.IOException;
 
 public class DownloadKUR {
     public String[][] DownloadKUR(String data) throws IOException {
-        Document doc = Jsoup.connect("http://www.cbr.ru/currency_base/daily.aspx?date_req="+data).get();
-        RS.getTextLog("URL cur: http://www.cbr.ru/currency_base/daily.aspx?date_req="+data);
+        Document doc = Jsoup.connect(RS.getURLforCurDB()+data).get();
+        RS.setTextLog(RS.getURLforCurDB()+data);
         Elements tdElements = doc.getElementsByClass("data");
 
         String html = String.valueOf(tdElements);
@@ -29,7 +29,7 @@ public class DownloadKUR {
                 kurr[i][t] = ttt[t];
             }
         }
-        RS.getTextLog(kurr);
+        RS.setTextLog(kurr);
         return kurr;
     }
 }

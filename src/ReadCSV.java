@@ -7,8 +7,8 @@ import java.util.Set;
 
 public class ReadCSV {
     public String[][] ReadCSV(String csvFile) throws IOException {
-        RS.getTextLog("Исходный файл загруженный в обработку");
-        RS.getTextLog("Адресс загруженного файла: "+"\""+csvFile+"\"");
+        RS.setTextLog("Исходный файл загруженный в обработку");
+        RS.setTextLog("Адресс загруженного файла: "+"\""+csvFile+"\"");
             BufferedReader reader = new BufferedReader(new FileReader(csvFile));
             String[][]mass;
 
@@ -61,7 +61,7 @@ public class ReadCSV {
 
             }
             reader2.close();
-            RS.getTextLog(mass);
+            RS.setTextLog(mass);
 
         return mass;
     }

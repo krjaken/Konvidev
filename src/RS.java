@@ -3,24 +3,17 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.io.File;
 import java.sql.*;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.LinkedHashSet;
 
 /**
  * Created by s.ivanov on 01.07.2017.
  */
 public final class RS extends GridBagConstraints {
-
-    final static LinkedHashSet<String> HashSetGroupAC = new LinkedHashSet<String>();
-    final static LinkedHashSet<String> HashSetGroup1C = new LinkedHashSet<String>();
     final static JTextArea textField = new JTextArea();
 
-    public static void getTextLog(String temp){
+    public static void setTextLog(String temp){
         textField.append("\""+temp+"\""+";\n");
     }
-    public static void getTextLog(String[][] mass){
+    public static void setTextLog(String[][] mass){
         for (int i=0;i<mass.length;i++){
             for (int t=0;t<mass[0].length;t++){
                 textField.append("\""+mass[i][t]+"\"; ");
@@ -28,39 +21,35 @@ public final class RS extends GridBagConstraints {
             textField.append("\n");
         }
     }
-    public static void getTextLog(Double dt){
-
-    }
 
 
     static {
         aaa();
     }
 
-    public static void aaa() {
+    public static void aaa(){
         textField.setLayout(new GridBagLayout());
         textField.append("История операций по расчету данных Пеймантикс\n");
-//        Calendar calendar = new GregorianCalendar();
-//        SimpleDateFormat formattedDate = new SimpleDateFormat("dd.MM.yyyy");
-//
-//        try {
-//            Connection connection = DriverManager.getConnection("jdbc:sqlite:FinDepMap.db");
-//            Statement statement = connection.createStatement();
-//            String sql = "SELECT groupAC from accentpay";
-//            String sql1 = "SELECT group1C from accentpay";
-//            ResultSet temp1 = statement.executeQuery(sql);
-//
-//            while(temp1.next()) {
-//                HashSetGroupAC.add(temp1.getString(1));
-//            }
-//            ResultSet temp2 = statement.executeQuery(sql1);
-//            while(temp2.next()) {
-//                HashSetGroup1C.add(temp2.getString(1));
-//            }
-//            connection.close();
-//        } catch (SQLException e) {
-//            JOptionPane.showInputDialog("Ошибка работы с массивом: "+e);
-//        }
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:sqlite:FinDep.db");
+            Statement statement = connection.createStatement();
+            //String sql = "SELECT groupAC from accentpay";
+            connection.close();
+        } catch (SQLException e) {
+
+            String url = "jdbc:sqlite:C:/sqlite/db/FinDep.db";
+
+            try (Connection conn = DriverManager.getConnection(url)) {
+                if (conn != null) {
+                    DatabaseMetaData meta = conn.getMetaData();
+                    System.out.println("The driver name is " + meta.getDriverName());
+                    System.out.println("A new database has been created.");
+                }
+
+            } catch (SQLException e11) {
+                System.out.println(e11.getMessage());
+            }
+        }
     }
 
     public static void addComponent(Container main, JComponent component, Rectangle location, int anchor, int fill) {
@@ -116,31 +105,151 @@ public final class RS extends GridBagConstraints {
         return fileChooser.getSelectedFile().getAbsolutePath();
     }
 
-    public static void UpdateDB(JFrame frame, String[][] transMap){
-        System.out.println("данные пришли на обновление ДБ");
-        //String temp = "UPDATE accentpay SET nameOfColumn = "+transMap[i][1]+", group1C = 'sasasa' WHERE id = 1;";
-        try {
-            //Class.forName("org.sqlite.JDBC");
-            Connection connection = DriverManager.getConnection("jdbc:sqlite:FinDepMap.db");
-            Statement statement = connection.createStatement();
-            System.out.println("Данные направлены на обновление!");
-            String sql = "DELETE FROM accentpay;\nREINDEX accentpay;\nVACUUM;";
-            System.out.println("Данные очищены");
-            statement.executeUpdate(sql);
-            for(int i=1;i<transMap.length ;i++) {
-                if (transMap[0][1].equals("nameOfColumn") && transMap[0][2].equals("numberColumn") && transMap[0][3].equals("tipeOfTransaktion") && transMap[0][4].equals("groupAC") && transMap[0][5].equals("group1C") && transMap[0][6].equals("group1CTransitFrom") && transMap[0][7].equals("group1CTransitFrom1") && transMap[0][8].equals("balans1C")) {
-                    sql = "INSERT INTO accentpay (nameOfColumn, numberColumn, tipeOfTransaktion, groupAC, group1C, group1CTransitFrom, group1CTransitFrom1, balans1C)\nVALUES (\"" + transMap[i][1] + "\", \"" + transMap[i][2] + "\", \"" + transMap[i][3] + "\", \"" + transMap[i][4] + "\", \"" + transMap[i][5] + "\", \"" + transMap[i][6] + "\", \"" + transMap[i][7] + "\", \"" + transMap[i][8] + "\" );";
-                    statement.executeUpdate(sql);
-                    System.out.println("Данные обновлены успешно!");
-                }
-            }
-            connection.close();
-            JOptionPane.showMessageDialog(frame,"База данный обновлена успешно");
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(frame,"База данных не обновлена, ошибка:\n"+e);
-        }
+    public static void setTextLog(Double dt){
 
     }
 
+    public static void setFeeParsentDB(String temp, JPanel mainPanel){
+
+    }
+    public static void setURLforCurDB(String temp, JPanel mainPanel){
+
+    }
+    public static String getFeeParsentDB(){
+        String result="0.12%";
+
+        return result;
+    }
+    public static String getURLforCurDB(){
+        String result="http://www.cbr.ru/currency_base/daily.aspx?date_req=";
+
+        return result;
+    }
+
+    public static void setTenancy(String temp, JPanel mainPanel){
+        try {
+            double dt = Double.parseDouble(temp);
+            if (dt<0){
+                JOptionPane.showMessageDialog(mainPanel,"Число не может быть отрицательным");
+            }else {
+                //this code add date to DB
+            }
+        }catch (Exception e){
+            JOptionPane.showMessageDialog(mainPanel,"Значение не являеться числом");
+        }
+
+    }
+    public static String getTenancy(){
+        String result="1132.00";
+        return result;
+    }
+
+    public static void setTechSupport(String temp, JPanel mainPanel){
+        try {
+            double dt = Double.parseDouble(temp);
+            if (dt<0){
+                JOptionPane.showMessageDialog(mainPanel,"Число не может быть отрицательным");
+            }else {
+                //this code add date to DB
+            }
+        }catch (Exception e){
+            JOptionPane.showMessageDialog(mainPanel,"Значение не являеться числом");
+        }
+    }
+    public static String getTechSupport(){
+        String result="1132.00";
+
+        return result;
+    }
+
+    public static void setKlientSupport(String temp, JPanel mainPanel){
+        try {
+            double dt = Double.parseDouble(temp);
+            if (dt<0){
+                JOptionPane.showMessageDialog(mainPanel,"Число не может быть отрицательным");
+            }else {
+                //this code add date to DB
+            }
+        }catch (Exception e){
+            JOptionPane.showMessageDialog(mainPanel,"Значение не являеться числом");
+        }
+    }
+    public static String getKlientSupport(){
+        String result="1132.00";
+
+        return result;
+    }
+
+    public static void setRiskM(String temp, JPanel mainPanel){
+        try {
+            double dt = Double.parseDouble(temp);
+            if (dt<0){
+                JOptionPane.showMessageDialog(mainPanel,"Число не может быть отрицательным");
+            }else {
+                //this code add date to DB
+            }
+        }catch (Exception e){
+            JOptionPane.showMessageDialog(mainPanel,"Значение не являеться числом");
+        }
+    }
+    public static String getRiskM(){
+        String result="2264.00";
+
+        return result;
+    }
+
+    public static void setAnalitik(String temp, JPanel mainPanel){
+        try {
+            double dt = Double.parseDouble(temp);
+            if (dt<0){
+                JOptionPane.showMessageDialog(mainPanel,"Число не может быть отрицательным");
+            }else {
+                //this code add date to DB
+            }
+        }catch (Exception e){
+            JOptionPane.showMessageDialog(mainPanel,"Значение не являеться числом");
+        }
+    }
+    public static String getAnalitik(){
+        String result="100000.00";
+
+        return result;
+    }
+
+    public static void setTesting(String temp, JPanel mainPanel){
+        try {
+            double dt = Double.parseDouble(temp);
+            if (dt<0){
+                JOptionPane.showMessageDialog(mainPanel,"Число не может быть отрицательным");
+            }else {
+                //this code add date to DB
+            }
+        }catch (Exception e){
+            JOptionPane.showMessageDialog(mainPanel,"Значение не являеться числом");
+        }
+    }
+    public static String getTesting(){
+        String result="120000.00";
+
+        return result;
+    }
+
+    public static void setDevelopment(String temp, JPanel mainPanel){
+        try {
+            double dt = Double.parseDouble(temp);
+            if (dt<0){
+                JOptionPane.showMessageDialog(mainPanel,"Число не может быть отрицательным");
+            }else {
+                //this code add date to DB
+            }
+        }catch (Exception e){
+            JOptionPane.showMessageDialog(mainPanel,"Значение не являеться числом");
+        }
+    }
+    public static String getDevelopment(){
+        String result="422400.00";
+
+        return result;
+    }
 
 }
