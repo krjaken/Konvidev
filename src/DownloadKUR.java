@@ -1,15 +1,14 @@
 import org.jsoup.*;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.File;
+import javax.swing.*;
 import java.io.IOException;
 
 public class DownloadKUR {
-    public String[][] DownloadKUR(String data) throws IOException {
-        Document doc = Jsoup.connect(RS.getURLforCurDB()+data).get();
-        RS.setTextLog(RS.getURLforCurDB()+data);
+    public String[][] DownloadKUR(String data, JPanel mainPane) throws IOException {
+        Document doc = Jsoup.connect(RS.getURLforCurDB(mainPane)+data).get();
+        RS.setTextLog(RS.getURLforCurDB(mainPane)+data);
         Elements tdElements = doc.getElementsByClass("data");
 
         String html = String.valueOf(tdElements);

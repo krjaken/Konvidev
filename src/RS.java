@@ -3,12 +3,14 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.io.File;
 import java.sql.*;
+import java.util.LinkedHashSet;
 
 /**
  * Created by s.ivanov on 01.07.2017.
  */
 public final class RS extends GridBagConstraints {
     final static JTextArea textField = new JTextArea();
+    private static LinkedHashSet<String> settingsList = new LinkedHashSet<String>();
 
     public static void setTextLog(String temp){
         textField.append("\""+temp+"\""+";\n");
@@ -28,27 +30,36 @@ public final class RS extends GridBagConstraints {
     }
 
     public static void aaa(){
+        settingsList.add("URLCurrDownload");
+        settingsList.add("ParsentFee");
+        settingsList.add("Tenancy");
+        settingsList.add("TechSupport");
+        settingsList.add("KlientSupport");
+        settingsList.add("RiskM");
+        settingsList.add("Analitik");
+        settingsList.add("Testing");
+        settingsList.add("Development");
         textField.setLayout(new GridBagLayout());
         textField.append("История операций по расчету данных Пеймантикс\n");
         try {
             Connection connection = DriverManager.getConnection("jdbc:sqlite:FinDep.db");
             Statement statement = connection.createStatement();
-            //String sql = "SELECT groupAC from accentpay";
+            String sql = "CREATE TABLE Settings "+
+                    "(TypeSettings CHAR(200) NOT NULL, "+
+                    "Value CHAR(200) NOT NULL, "+
+                    "DateUpdate LONG NOT NULL)";
+            statement.executeUpdate(sql);
+            // сюда создать БД для хранения лога в виду файлов и массивов
+
+            for (String s: settingsList){
+                sql = "INSERT INTO Settings (TypeSettings,Value,DateUpdate) " +
+                        "VALUES ('"+s+"', '0',0);";
+                statement.executeUpdate(sql) ;
+            }
+            statement.close();
             connection.close();
         } catch (SQLException e) {
 
-            String url = "jdbc:sqlite:C:/sqlite/db/FinDep.db";
-
-            try (Connection conn = DriverManager.getConnection(url)) {
-                if (conn != null) {
-                    DatabaseMetaData meta = conn.getMetaData();
-                    System.out.println("The driver name is " + meta.getDriverName());
-                    System.out.println("A new database has been created.");
-                }
-
-            } catch (SQLException e11) {
-                System.out.println(e11.getMessage());
-            }
         }
     }
 
@@ -106,23 +117,43 @@ public final class RS extends GridBagConstraints {
     }
 
     public static void setTextLog(Double dt){
-
+        //сюда пишем заполнения лога
     }
 
     public static void setFeeParsentDB(String temp, JPanel mainPanel){
-
+        Double dt=0.00;
+        try {
+            dt = Double.parseDouble(temp);
+        }catch (Exception e){
+            JOptionPane.showMessageDialog(mainPanel,"Значение не являеться числом");
+        }
+        if (dt<=0){
+            JOptionPane.showMessageDialog(mainPanel,"Значение не может быть отрицательным или 0");
+        }else if (dt>=100){
+            JOptionPane.showMessageDialog(mainPanel,"Значение не может быть больше 100%");
+        }else {
+            String sql = "ParsentFee";
+            RS.addValueInDB(sql,temp,mainPanel);
+        }
     }
     public static void setURLforCurDB(String temp, JPanel mainPanel){
-
+        if (temp.contains("http://")||temp.contains("https://")){
+            String sql = "URLCurrDownload";
+            RS.addValueInDB(sql,temp,mainPanel);
+        }else {
+            JOptionPane.showMessageDialog(mainPanel,"Данные не являються ссылкой на сайт");
+        }
     }
-    public static String getFeeParsentDB(){
-        String result="0.12%";
-
+    public static String getFeeParsentDB(JPanel mainPane){
+        //"0.12%"
+        String sql ="ParsentFee";
+        String result=getValueFromDB(sql,mainPane);
         return result;
     }
-    public static String getURLforCurDB(){
-        String result="http://www.cbr.ru/currency_base/daily.aspx?date_req=";
-
+    public static String getURLforCurDB(JPanel mainPane){
+        //"http://www.cbr.ru/currency_base/daily.aspx?date_req=";
+        String sql ="URLCurrDownload";
+        String result=getValueFromDB(sql,mainPane);
         return result;
     }
 
@@ -132,15 +163,18 @@ public final class RS extends GridBagConstraints {
             if (dt<0){
                 JOptionPane.showMessageDialog(mainPanel,"Число не может быть отрицательным");
             }else {
-                //this code add date to DB
+                String sql = "Tenancy";
+                RS.addValueInDB(sql,temp,mainPanel);
             }
         }catch (Exception e){
             JOptionPane.showMessageDialog(mainPanel,"Значение не являеться числом");
         }
 
     }
-    public static String getTenancy(){
-        String result="1132.00";
+    public static String getTenancy(JPanel mainPane){
+        //String result="1132.00";
+        String sql ="Tenancy";
+        String result=getValueFromDB(sql,mainPane);
         return result;
     }
 
@@ -150,15 +184,17 @@ public final class RS extends GridBagConstraints {
             if (dt<0){
                 JOptionPane.showMessageDialog(mainPanel,"Число не может быть отрицательным");
             }else {
-                //this code add date to DB
+                String sql = "TechSupport";
+                RS.addValueInDB(sql,temp,mainPanel);
             }
         }catch (Exception e){
             JOptionPane.showMessageDialog(mainPanel,"Значение не являеться числом");
         }
     }
-    public static String getTechSupport(){
-        String result="1132.00";
-
+    public static String getTechSupport(JPanel mainPane){
+        //String result="1132.00";
+        String sql ="TechSupport";
+        String result=getValueFromDB(sql,mainPane);
         return result;
     }
 
@@ -168,15 +204,17 @@ public final class RS extends GridBagConstraints {
             if (dt<0){
                 JOptionPane.showMessageDialog(mainPanel,"Число не может быть отрицательным");
             }else {
-                //this code add date to DB
+                String sql = "KlientSupport";
+                RS.addValueInDB(sql,temp,mainPanel);
             }
         }catch (Exception e){
             JOptionPane.showMessageDialog(mainPanel,"Значение не являеться числом");
         }
     }
-    public static String getKlientSupport(){
-        String result="1132.00";
-
+    public static String getKlientSupport(JPanel mainPane){
+        //String result="1132.00";
+        String sql ="KlientSupport";
+        String result=getValueFromDB(sql,mainPane);
         return result;
     }
 
@@ -186,15 +224,17 @@ public final class RS extends GridBagConstraints {
             if (dt<0){
                 JOptionPane.showMessageDialog(mainPanel,"Число не может быть отрицательным");
             }else {
-                //this code add date to DB
+                String sql = "RiskM";
+                RS.addValueInDB(sql,temp,mainPanel);
             }
         }catch (Exception e){
             JOptionPane.showMessageDialog(mainPanel,"Значение не являеться числом");
         }
     }
-    public static String getRiskM(){
-        String result="2264.00";
-
+    public static String getRiskM(JPanel mainPane){
+        //String result="2264.00";
+        String sql ="RiskM";
+        String result=getValueFromDB(sql,mainPane);
         return result;
     }
 
@@ -204,15 +244,17 @@ public final class RS extends GridBagConstraints {
             if (dt<0){
                 JOptionPane.showMessageDialog(mainPanel,"Число не может быть отрицательным");
             }else {
-                //this code add date to DB
+                String sql = "Analitik";
+                RS.addValueInDB(sql,temp,mainPanel);
             }
         }catch (Exception e){
             JOptionPane.showMessageDialog(mainPanel,"Значение не являеться числом");
         }
     }
-    public static String getAnalitik(){
-        String result="100000.00";
-
+    public static String getAnalitik(JPanel mainPane){
+        //String result="100000.00";
+        String sql ="Analitik";
+        String result=getValueFromDB(sql,mainPane);
         return result;
     }
 
@@ -222,15 +264,17 @@ public final class RS extends GridBagConstraints {
             if (dt<0){
                 JOptionPane.showMessageDialog(mainPanel,"Число не может быть отрицательным");
             }else {
-                //this code add date to DB
+                String sql = "Testing";
+                RS.addValueInDB(sql,temp,mainPanel);
             }
         }catch (Exception e){
             JOptionPane.showMessageDialog(mainPanel,"Значение не являеться числом");
         }
     }
-    public static String getTesting(){
-        String result="120000.00";
-
+    public static String getTesting(JPanel mainPane){
+        //String result="120000.00";
+        String sql ="Testing";
+        String result=getValueFromDB(sql,mainPane);
         return result;
     }
 
@@ -240,16 +284,49 @@ public final class RS extends GridBagConstraints {
             if (dt<0){
                 JOptionPane.showMessageDialog(mainPanel,"Число не может быть отрицательным");
             }else {
-                //this code add date to DB
+                String sql = "Development";
+                RS.addValueInDB(sql,temp,mainPanel);
             }
         }catch (Exception e){
             JOptionPane.showMessageDialog(mainPanel,"Значение не являеться числом");
         }
     }
-    public static String getDevelopment(){
-        String result="422400.00";
-
+    public static String getDevelopment(JPanel mainPane){
+        //String result="422400.00";
+        String sql ="Development";
+        String result=getValueFromDB(sql,mainPane);
         return result;
     }
+    public static void setSettingsList(String temp){
+        settingsList.add(temp);
+    }
 
+    private static void addValueInDB(String sql,String value, JPanel mainPanel){
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:sqlite:FinDep.db");
+            Statement statement = connection.createStatement();
+            statement.executeUpdate("UPDATE Settings SET Value = '"+value+"' WHERE TypeSettings = '"+sql+"'");
+            statement.close();
+            connection.close();
+            JOptionPane.showMessageDialog(mainPanel,"Данные успешно обновлены");
+        }catch (SQLException e) {
+            JOptionPane.showMessageDialog(mainPanel,"Ошибка добавления данных в БД\n"+e);
+        }
+    }
+
+    private static String getValueFromDB(String sql, JPanel mainPanel){
+        String value;
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:sqlite:FinDep.db");
+            Statement statement = connection.createStatement();
+            ResultSet rs = statement.executeQuery("SELECT Value FROM Settings WHERE TypeSettings = '"+sql+"'");
+            value = rs.getString("Value");
+            statement.close();
+            connection.close();
+        }catch (SQLException e) {
+            value ="";
+            JOptionPane.showMessageDialog(mainPanel,"Ошибка получения данных с БД\n"+e);
+        }
+        return value;
+    }
 }

@@ -35,92 +35,93 @@ public class Settings extends JPanel {
 
     public Settings() throws ParseException {
         setLayout(new GridBagLayout());
-        jlURLkukrs.setText(RS.getURLforCurDB());
-        jlPersentFEE.setText(RS.getFeeParsentDB());
-        jlTenancy.setText(RS.getTenancy());
-        jlTechSupport.setText(RS.getTechSupport());
-        jlKlientSupport.setText(RS.getKlientSupport());
-        jlRiskM.setText(RS.getRiskM());
-        jlAnalitik.setText(RS.getAnalitik());
-        jlTesting.setText(RS.getTesting());
-        jlDevelopment.setText(RS.getDevelopment());
+        jlURLkukrs.setText(RS.getURLforCurDB(Settings.this));
+        jlPersentFEE.setText(RS.getFeeParsentDB(Settings.this));
+        jlTenancy.setText(RS.getTenancy(Settings.this));
+        jlTechSupport.setText(RS.getTechSupport(Settings.this));
+        jlKlientSupport.setText(RS.getKlientSupport(Settings.this));
+        jlRiskM.setText(RS.getRiskM(Settings.this));
+        jlAnalitik.setText(RS.getAnalitik(Settings.this));
+        jlTesting.setText(RS.getTesting(Settings.this));
+        jlDevelopment.setText(RS.getDevelopment(Settings.this));
 
-        ADDObjINSettings(jlURLkukrs,jbSaveURL);
-        ADDObjINSettings(jlPersentFEE,jbFEE);
-        ADDObjINSettings(jlTenancy,jbTenancy);
-        ADDObjINSettings(jlTechSupport,jbTechSupport);
-        ADDObjINSettings(jlKlientSupport,jbKlientSupport);
-        ADDObjINSettings(jlRiskM,jbRiskM);
-        ADDObjINSettings(jlAnalitik,jbAnalitik);
-        ADDObjINSettings(jlTesting,jbTesting);
-        ADDObjINSettings(jlDevelopment,jbDevelopment);
+        ADDObjINSettings(jlURLkukrs,jbSaveURL,"URLCurrDownload");
+        ADDObjINSettings(jlPersentFEE,jbFEE,"ParsentFee");
+        ADDObjINSettings(jlTenancy,jbTenancy,"Tenancy");
+        ADDObjINSettings(jlTechSupport,jbTechSupport,"TechSupport");
+        ADDObjINSettings(jlKlientSupport,jbKlientSupport,"KlientSupport");
+        ADDObjINSettings(jlRiskM,jbRiskM,"RiskM");
+        ADDObjINSettings(jlAnalitik,jbAnalitik,"Analitik");
+        ADDObjINSettings(jlTesting,jbTesting,"Testing");
+        ADDObjINSettings(jlDevelopment,jbDevelopment,"Development");
         RS.addComponent(Settings.this,new JPanel(),new Rectangle(0,9,2,1),GridBagConstraints.WEST,GridBagConstraints.BOTH);
         jbSaveURL.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 RS.setURLforCurDB(JOptionPane.showInputDialog("Введите новый адрес с которого будет производиться загрузка курсов"),Settings.this);
-                jlURLkukrs.setText(RS.getURLforCurDB());
+                jlURLkukrs.setText(RS.getURLforCurDB(Settings.this));
             }
         });
         jbFEE.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 RS.setFeeParsentDB(JOptionPane.showInputDialog("Введите % комиссии по договору"),Settings.this);
-                jlPersentFEE.setText(RS.getFeeParsentDB());
+                jlPersentFEE.setText(RS.getFeeParsentDB(Settings.this));
             }
         });
         jbTenancy.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 RS.setTenancy(JOptionPane.showInputDialog("Введите стоимость аренды оборудования (руб)"),Settings.this);
-                jlTenancy.setText(RS.getTenancy());
+                jlTenancy.setText(RS.getTenancy(Settings.this));
             }
         });
         jbTechSupport.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 RS.setTechSupport(JOptionPane.showInputDialog("Введите стоимость технической поддержки (руб)"),Settings.this);
-                jlTechSupport.setText(RS.getTechSupport());
+                jlTechSupport.setText(RS.getTechSupport(Settings.this));
             }
         });
         jbKlientSupport.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 RS.setKlientSupport(JOptionPane.showInputDialog("Введите стоимость клиентской поддуржки (руб)"),Settings.this);
-                jlKlientSupport.setText(RS.getKlientSupport());
+                jlKlientSupport.setText(RS.getKlientSupport(Settings.this));
             }
         });
         jbRiskM.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 RS.setRiskM(JOptionPane.showInputDialog("Введите стоимость Риск менеджмент(руб)"),Settings.this);
-                jlRiskM.setText(RS.getRiskM());
+                jlRiskM.setText(RS.getRiskM(Settings.this));
             }
         });
         jbAnalitik.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 RS.setAnalitik(JOptionPane.showInputDialog("Введите стоимость аналитических расходов (руб)"),Settings.this);
-                jlAnalitik.setText(RS.getAnalitik());
+                jlAnalitik.setText(RS.getAnalitik(Settings.this));
             }
         });
         jbTesting.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 RS.setTesting(JOptionPane.showInputDialog("Введите стоимость тестирования (руб)"),Settings.this);
-                jlTesting.setText(RS.getTesting());
+                jlTesting.setText(RS.getTesting(Settings.this));
             }
         });
         jbDevelopment.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 RS.setDevelopment(JOptionPane.showInputDialog("Введите стоимость разработки (руб)"),Settings.this);
-                jlDevelopment.setText(RS.getDevelopment());
+                jlDevelopment.setText(RS.getDevelopment(Settings.this));
             }
         });
     }
     int i=0;
-    private void ADDObjINSettings(JLabel label, JButton button){
+    private void ADDObjINSettings(JLabel label, JButton button,String nameOfSetting){
+        RS.setSettingsList(nameOfSetting);
         Border etched = BorderFactory.createEtchedBorder();
         label.setPreferredSize(new Dimension(150,30));
         button.setPreferredSize(new Dimension(70,30));

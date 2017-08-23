@@ -90,7 +90,7 @@ public class PP extends JPanel {
             public void mouseClicked(MouseEvent e) {
 
                 try {
-                    Visual(new DownloadKUR().DownloadKUR(DateK.getText()),mainFrame);
+                    Visual(new DownloadKUR().DownloadKUR(DateK.getText(),PP.this),mainFrame);
                     jpUpdate.removeAll();
                     jpUpdate.add(new JLabel(new ImageIcon("imgOK.gif")));
                     mainFrame.revalidate();
@@ -356,12 +356,12 @@ public class PP extends JPanel {
 
         invoice[7+i][2] = new DecimalFormat("##,###,###,##0.0000").format(Pars(invoice[7+i][2]));
 
-        invoice[7+i][0]="Тариф, более 7М EUR"; invoice[7+i][2]=RS.getFeeParsentDB();
-        invoice[8+i][0]="Лицензия"; invoice[8+i][2]=new DecimalFormat("##########0.00").format(((Pars(invoice[6 + i][2])/100*Double.parseDouble(RS.getFeeParsentDB()))));
-        invoice[9+i][0]="Аренда оборудования"; invoice[9+i][2]=RS.getTenancy();
-        invoice[10+i][0]="Тех.сопровождение"; invoice[10+i][2]=RS.getTechSupport();
-        invoice[11+i][0]="Тех.поддержка клиентов"; invoice[11+i][2]=RS.getKlientSupport();
-        invoice[12+i][0]="Риск-менеджмент"; invoice[12+i][2]=RS.getRiskM();
+        invoice[7+i][0]="Тариф, более 7М EUR"; invoice[7+i][2]=RS.getFeeParsentDB(PP.this);
+        invoice[8+i][0]="Лицензия"; invoice[8+i][2]=new DecimalFormat("##########0.00").format(((Pars(invoice[6 + i][2])/100*Double.parseDouble(RS.getFeeParsentDB(PP.this)))));
+        invoice[9+i][0]="Аренда оборудования"; invoice[9+i][2]=RS.getTenancy(PP.this);
+        invoice[10+i][0]="Тех.сопровождение"; invoice[10+i][2]=RS.getTechSupport(PP.this);
+        invoice[11+i][0]="Тех.поддержка клиентов"; invoice[11+i][2]=RS.getKlientSupport(PP.this);
+        invoice[12+i][0]="Риск-менеджмент"; invoice[12+i][2]=RS.getRiskM(PP.this);
         invoice[13+i][0]="Итого";
         invoice[13+i][2]="0.00";
         for (int tr=0;tr<5;tr++){
@@ -373,9 +373,9 @@ public class PP extends JPanel {
 
         for (int m = 0; m <ActualKurrKonvers.length;m++){
             if (ActualKurrKonvers[m][0].equals("RUB")){
-                invoice[14+i][2]=new DecimalFormat("##########0.00").format(((Double.parseDouble(RS.getAnalitik())/Pars(ActualKurrKonvers[m][1])*Pars(ActualKurrKonvers[m][2]))));
-                invoice[15+i][2]=new DecimalFormat("##########0.00").format(((Double.parseDouble(RS.getTesting())/Pars(ActualKurrKonvers[m][1])*Pars(ActualKurrKonvers[m][2]))));
-                invoice[16+i][2]=new DecimalFormat("##########0.00").format(((Double.parseDouble(RS.getDevelopment())/Pars(ActualKurrKonvers[m][1])*Pars(ActualKurrKonvers[m][2]))));
+                invoice[14+i][2]=new DecimalFormat("##########0.00").format(((Double.parseDouble(RS.getAnalitik(PP.this))/Pars(ActualKurrKonvers[m][1])*Pars(ActualKurrKonvers[m][2]))));
+                invoice[15+i][2]=new DecimalFormat("##########0.00").format(((Double.parseDouble(RS.getTesting(PP.this))/Pars(ActualKurrKonvers[m][1])*Pars(ActualKurrKonvers[m][2]))));
+                invoice[16+i][2]=new DecimalFormat("##########0.00").format(((Double.parseDouble(RS.getDevelopment(PP.this))/Pars(ActualKurrKonvers[m][1])*Pars(ActualKurrKonvers[m][2]))));
             }
         }
 
