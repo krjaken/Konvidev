@@ -1,7 +1,7 @@
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.io.File;
+import java.io.*;
 import java.sql.*;
 import java.util.LinkedHashSet;
 
@@ -9,21 +9,8 @@ import java.util.LinkedHashSet;
  * Created by s.ivanov on 01.07.2017.
  */
 public final class RS extends GridBagConstraints {
-    final static JTextArea textField = new JTextArea();
     private static LinkedHashSet<String> settingsList = new LinkedHashSet<String>();
-
-    public static void setTextLog(String temp){
-        textField.append("\""+temp+"\""+";\n");
-    }
-    public static void setTextLog(String[][] mass){
-        for (int i=0;i<mass.length;i++){
-            for (int t=0;t<mass[0].length;t++){
-                textField.append("\""+mass[i][t]+"\"; ");
-            }
-            textField.append("\n");
-        }
-    }
-
+    private static Timestamp timestamp;
 
     static {
         aaa();
@@ -39,8 +26,7 @@ public final class RS extends GridBagConstraints {
         settingsList.add("Analitik");
         settingsList.add("Testing");
         settingsList.add("Development");
-        textField.setLayout(new GridBagLayout());
-        textField.append("История операций по расчету данных Пеймантикс\n");
+
         try {
             Connection connection = DriverManager.getConnection("jdbc:sqlite:FinDep.db");
             Statement statement = connection.createStatement();
@@ -49,7 +35,18 @@ public final class RS extends GridBagConstraints {
                     "Value CHAR(200) NOT NULL, "+
                     "DateUpdate LONG NOT NULL)";
             statement.executeUpdate(sql);
-            // сюда создать БД для хранения лога в виду файлов и массивов
+
+            sql = "CREATE TABLE Log "+
+                    "(TimeStamp TIMESTAMP NOT NULL, "+
+                    "URLCurr CHAR(200), "+
+                    "CurrList BLOB, "+//тут надо хранить массив курсы скчаные с сайта
+                    "ConverCurrList BLOB, "+//тут храним массив курсов конвертации
+                    "FileCSV BLOB, "+//тут храним файл ЦСВ что мы загрузили
+                    "PartnersGroup BLOB, "+//список групп продавцев
+                    "PartnersSum BLOB, "+
+                    "Result BLOB, "+
+                    "ResultCSV BLOB)";
+            statement.executeUpdate(sql);
 
             for (String s: settingsList){
                 sql = "INSERT INTO Settings (TypeSettings,Value,DateUpdate) " +
@@ -61,6 +58,124 @@ public final class RS extends GridBagConstraints {
         } catch (SQLException e) {
 
         }
+    }
+
+    public static void setURLCurrLog(String value, JPanel mainPanel){
+        String columnNameSet ="URLCurr";
+        updateValueInDB("Log",columnNameSet,value,"TimeStamp",timestamp,mainPanel);
+    }
+    public static String getURLCurrLog(JPanel mainPane){
+        String columnName = "URLCurr";
+        String result;
+        try {
+            result = (String) getValueFromDB(columnName, "Log", "TimeStamp",timestamp, mainPane);
+        }catch (Exception e){
+            result = "";
+            JOptionPane.showMessageDialog(mainPane,"Непредвиденная ошибка БД\n"+e);
+        }
+        return result;
+    }
+    public static void setCurrListLog(String value, JPanel mainPanel){
+        String columnNameSet = "CurrList";
+        updateValueInDB("Log",columnNameSet,value,"TimeStamp",timestamp,mainPanel);
+    }
+    public static Object getCurrListLog(JPanel mainPane){
+        String columnName = "CurrList";
+        String[][] result = new String[0][0];
+        try {
+            result = (String[][]) getValueFromDB(columnName, "Log", "TimeStamp",timestamp,mainPane);
+        }catch (Exception e){
+            JOptionPane.showMessageDialog(mainPane,"Непредвиденная ошибка БД\n"+e);
+        }
+        return result;
+    }
+    public static void setConverCurrListLog(String value, JPanel mainPanel){
+        String columnNameSet = "ConverCurrList";
+        updateValueInDB("Log",columnNameSet,value,"TimeStamp",timestamp,mainPanel);
+    }
+    public static Object getConverCurrListLog(JPanel mainPane){
+        String sql = "ConverCurrList";
+        return "";
+    }
+
+    public static void updateFileLog(String filename, JPanel mainPane) {
+        // update sql
+        String updateSQL = "UPDATE Log "
+                + "SET FileCSV = ? "
+                + "WHERE TimeStamp = '"+timestamp+"'";
+
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:FinDep.db");
+            PreparedStatement pstmt = conn.prepareStatement(updateSQL);
+
+            // set parameters
+            pstmt.setBytes(1, readFile(filename));
+            pstmt.executeUpdate();
+            System.out.println("Stored the file in the BLOB column.");
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static Object getFileCSVLog(JPanel mainPane){
+        String sql = "FileCSV";
+        return "";
+    }
+    public static void setPartnersGroupLog(String[][] value, JPanel mainPanel){
+        String columnNameSet ="PartnersGroup";
+        updateValueInDB("Log",columnNameSet,value,"TimeStamp",timestamp,mainPanel);
+    }
+    public static Object getPartnersGroupLog(JPanel mainPane){
+        String sql = "PartnersGroup";
+        return "";
+    }
+    public static void setPartnersSumLog(String value, JPanel mainPanel){
+        String columnNameSet = "PartnersSum";
+        updateValueInDB("Log",columnNameSet,value,"TimeStamp",timestamp,mainPanel);
+    }
+    public static Object getPartnersSumLog(JPanel mainPane){
+        String sql = "PartnersSum";
+        return "";
+    }
+    public static void setResultLog(String value, JPanel mainPanel){
+        String columnNameSet = "Result";
+        updateValueInDB("Log",columnNameSet,value,"TimeStamp",timestamp,mainPanel);
+    }
+    public static Object getResultLog(JPanel mainPane){
+        String sql = "Result";
+        return "";
+    }
+    public static void setResultCSVLog(File value, JPanel mainPanel){
+        String columnNameSet = "ResultCSV";
+        updateValueInDB("Log",columnNameSet,value,"TimeStamp",timestamp,mainPanel);
+    }
+    public static Object getResultCSVLog(JPanel mainPane){
+        String sql = "ResultCSV";
+        return "";
+    }
+    public static void addTimeStampLog(JPanel mainPane){
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:sqlite:FinDep.db");
+            Statement statement = connection.createStatement();
+            timestamp = new Timestamp(System.currentTimeMillis());
+            System.out.println(timestamp);
+            String sql = "INSERT INTO Log (TimeStamp, URLCurr, CurrList, ConverCurrList, FileCSV, PartnersGroup, PartnersSum, Result, ResultCSV) " +
+                    "VALUES ('"+timestamp+"', '-', '-', '-', '-', '-', '-', '-', '-');";
+            statement.executeUpdate(sql) ;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    public static Timestamp getTimeStampLog(String sql, JPanel mainPane){
+        String columnName = "TimeStamp";
+        Timestamp timestamp1 = null;
+        try {
+            timestamp1 = (Timestamp) getValueFromDB(columnName,"Log",columnName,sql,mainPane);
+        }catch (Exception e){
+            JOptionPane.showMessageDialog(mainPane,"Непредвиденная ошибка БД\n"+e);
+        }
+        return timestamp1;
     }
 
     public static void addComponent(Container main, JComponent component, Rectangle location, int anchor, int fill) {
@@ -120,10 +235,10 @@ public final class RS extends GridBagConstraints {
         //сюда пишем заполнения лога
     }
 
-    public static void setFeeParsentDB(String temp, JPanel mainPanel){
+    public static void setFeeParsentDB(String value, JPanel mainPanel){
         Double dt=0.00;
         try {
-            dt = Double.parseDouble(temp);
+            dt = Double.parseDouble(value);
         }catch (Exception e){
             JOptionPane.showMessageDialog(mainPanel,"Значение не являеться числом");
         }
@@ -132,14 +247,14 @@ public final class RS extends GridBagConstraints {
         }else if (dt>=100){
             JOptionPane.showMessageDialog(mainPanel,"Значение не может быть больше 100%");
         }else {
-            String sql = "ParsentFee";
-            RS.addValueInDB(sql,temp,mainPanel);
+            String ident = "ParsentFee";
+            updateValueInDB("Settings","Value",value,"TypeSettings",ident,mainPanel);
         }
     }
-    public static void setURLforCurDB(String temp, JPanel mainPanel){
-        if (temp.contains("http://")||temp.contains("https://")){
-            String sql = "URLCurrDownload";
-            RS.addValueInDB(sql,temp,mainPanel);
+    public static void setURLforCurDB(String value, JPanel mainPanel){
+        if (value.contains("http://")||value.contains("https://")){
+            String ident = "URLCurrDownload";
+            updateValueInDB("Settings","Value",value,"TypeSettings",ident,mainPanel);
         }else {
             JOptionPane.showMessageDialog(mainPanel,"Данные не являються ссылкой на сайт");
         }
@@ -147,24 +262,24 @@ public final class RS extends GridBagConstraints {
     public static String getFeeParsentDB(JPanel mainPane){
         //"0.12%"
         String sql ="ParsentFee";
-        String result=getValueFromDB(sql,mainPane);
+        String result= (String) getValueFromDB("Value", "Settings", "TypeSettings",sql,mainPane);
         return result;
     }
     public static String getURLforCurDB(JPanel mainPane){
         //"http://www.cbr.ru/currency_base/daily.aspx?date_req=";
         String sql ="URLCurrDownload";
-        String result=getValueFromDB(sql,mainPane);
+        String result= (String) getValueFromDB("Value", "Settings", "TypeSettings",sql,mainPane);
         return result;
     }
 
-    public static void setTenancy(String temp, JPanel mainPanel){
+    public static void setTenancy(String value, JPanel mainPanel){
         try {
-            double dt = Double.parseDouble(temp);
+            double dt = Double.parseDouble(value);
             if (dt<0){
                 JOptionPane.showMessageDialog(mainPanel,"Число не может быть отрицательным");
             }else {
-                String sql = "Tenancy";
-                RS.addValueInDB(sql,temp,mainPanel);
+                String ident = "Tenancy";
+                updateValueInDB("Settings","Value",value,"TypeSettings",ident,mainPanel);
             }
         }catch (Exception e){
             JOptionPane.showMessageDialog(mainPanel,"Значение не являеться числом");
@@ -174,18 +289,18 @@ public final class RS extends GridBagConstraints {
     public static String getTenancy(JPanel mainPane){
         //String result="1132.00";
         String sql ="Tenancy";
-        String result=getValueFromDB(sql,mainPane);
+        String result= (String) getValueFromDB("Value", "Settings", "TypeSettings",sql,mainPane);
         return result;
     }
 
-    public static void setTechSupport(String temp, JPanel mainPanel){
+    public static void setTechSupport(String value, JPanel mainPanel){
         try {
-            double dt = Double.parseDouble(temp);
+            double dt = Double.parseDouble(value);
             if (dt<0){
                 JOptionPane.showMessageDialog(mainPanel,"Число не может быть отрицательным");
             }else {
-                String sql = "TechSupport";
-                RS.addValueInDB(sql,temp,mainPanel);
+                String ident = "TechSupport";
+                updateValueInDB("Settings","Value",value,"TypeSettings",ident,mainPanel);
             }
         }catch (Exception e){
             JOptionPane.showMessageDialog(mainPanel,"Значение не являеться числом");
@@ -194,18 +309,18 @@ public final class RS extends GridBagConstraints {
     public static String getTechSupport(JPanel mainPane){
         //String result="1132.00";
         String sql ="TechSupport";
-        String result=getValueFromDB(sql,mainPane);
+        String result= (String) getValueFromDB("Value", "Settings", "TypeSettings",sql,mainPane);
         return result;
     }
 
-    public static void setKlientSupport(String temp, JPanel mainPanel){
+    public static void setKlientSupport(String value, JPanel mainPanel){
         try {
-            double dt = Double.parseDouble(temp);
+            double dt = Double.parseDouble(value);
             if (dt<0){
                 JOptionPane.showMessageDialog(mainPanel,"Число не может быть отрицательным");
             }else {
-                String sql = "KlientSupport";
-                RS.addValueInDB(sql,temp,mainPanel);
+                String ident = "KlientSupport";
+                updateValueInDB("Settings","Value",value,"TypeSettings",ident,mainPanel);
             }
         }catch (Exception e){
             JOptionPane.showMessageDialog(mainPanel,"Значение не являеться числом");
@@ -214,18 +329,18 @@ public final class RS extends GridBagConstraints {
     public static String getKlientSupport(JPanel mainPane){
         //String result="1132.00";
         String sql ="KlientSupport";
-        String result=getValueFromDB(sql,mainPane);
+        String result= (String) getValueFromDB("Value", "Settings", "TypeSettings",sql,mainPane);
         return result;
     }
 
-    public static void setRiskM(String temp, JPanel mainPanel){
+    public static void setRiskM(String value, JPanel mainPanel){
         try {
-            double dt = Double.parseDouble(temp);
+            double dt = Double.parseDouble(value);
             if (dt<0){
                 JOptionPane.showMessageDialog(mainPanel,"Число не может быть отрицательным");
             }else {
-                String sql = "RiskM";
-                RS.addValueInDB(sql,temp,mainPanel);
+                String ident = "RiskM";
+                updateValueInDB("Settings","Value",value,"TypeSettings",ident,mainPanel);
             }
         }catch (Exception e){
             JOptionPane.showMessageDialog(mainPanel,"Значение не являеться числом");
@@ -234,18 +349,18 @@ public final class RS extends GridBagConstraints {
     public static String getRiskM(JPanel mainPane){
         //String result="2264.00";
         String sql ="RiskM";
-        String result=getValueFromDB(sql,mainPane);
+        String result= (String) getValueFromDB("Value", "Settings", "TypeSettings",sql,mainPane);
         return result;
     }
 
-    public static void setAnalitik(String temp, JPanel mainPanel){
+    public static void setAnalitik(String value, JPanel mainPanel){
         try {
-            double dt = Double.parseDouble(temp);
+            double dt = Double.parseDouble(value);
             if (dt<0){
                 JOptionPane.showMessageDialog(mainPanel,"Число не может быть отрицательным");
             }else {
-                String sql = "Analitik";
-                RS.addValueInDB(sql,temp,mainPanel);
+                String ident = "Analitik";
+                updateValueInDB("Settings","Value",value,"TypeSettings",ident,mainPanel);
             }
         }catch (Exception e){
             JOptionPane.showMessageDialog(mainPanel,"Значение не являеться числом");
@@ -254,18 +369,18 @@ public final class RS extends GridBagConstraints {
     public static String getAnalitik(JPanel mainPane){
         //String result="100000.00";
         String sql ="Analitik";
-        String result=getValueFromDB(sql,mainPane);
+        String result= (String) getValueFromDB("Value", "Settings", "TypeSettings",sql,mainPane);
         return result;
     }
 
-    public static void setTesting(String temp, JPanel mainPanel){
+    public static void setTesting(String value, JPanel mainPanel){
         try {
-            double dt = Double.parseDouble(temp);
+            double dt = Double.parseDouble(value);
             if (dt<0){
                 JOptionPane.showMessageDialog(mainPanel,"Число не может быть отрицательным");
             }else {
-                String sql = "Testing";
-                RS.addValueInDB(sql,temp,mainPanel);
+                String ident = "Testing";
+                updateValueInDB("Settings","Value",value,"TypeSettings",ident,mainPanel);
             }
         }catch (Exception e){
             JOptionPane.showMessageDialog(mainPanel,"Значение не являеться числом");
@@ -274,18 +389,18 @@ public final class RS extends GridBagConstraints {
     public static String getTesting(JPanel mainPane){
         //String result="120000.00";
         String sql ="Testing";
-        String result=getValueFromDB(sql,mainPane);
+        String result= (String) getValueFromDB("Value", "Settings", "TypeSettings",sql,mainPane);
         return result;
     }
 
-    public static void setDevelopment(String temp, JPanel mainPanel){
+    public static void setDevelopment(String value, JPanel mainPanel){
         try {
-            double dt = Double.parseDouble(temp);
+            double dt = Double.parseDouble(value);
             if (dt<0){
                 JOptionPane.showMessageDialog(mainPanel,"Число не может быть отрицательным");
             }else {
-                String sql = "Development";
-                RS.addValueInDB(sql,temp,mainPanel);
+                String ident = "Development";
+                RS.updateValueInDB("Settings","Value",value,"TypeSettings",ident,mainPanel);
             }
         }catch (Exception e){
             JOptionPane.showMessageDialog(mainPanel,"Значение не являеться числом");
@@ -294,33 +409,32 @@ public final class RS extends GridBagConstraints {
     public static String getDevelopment(JPanel mainPane){
         //String result="422400.00";
         String sql ="Development";
-        String result=getValueFromDB(sql,mainPane);
+        String result= (String) getValueFromDB("Value", "Settings", "TypeSettings",sql,mainPane);
         return result;
     }
     public static void setSettingsList(String temp){
         settingsList.add(temp);
     }
 
-    private static void addValueInDB(String sql,String value, JPanel mainPanel){
+    private static void updateValueInDB(String tabName,String columnNameSet,Object value,String columnID,Object ident, JPanel mainPanel){
         try {
             Connection connection = DriverManager.getConnection("jdbc:sqlite:FinDep.db");
             Statement statement = connection.createStatement();
-            statement.executeUpdate("UPDATE Settings SET Value = '"+value+"' WHERE TypeSettings = '"+sql+"'");
+            statement.executeUpdate("UPDATE "+tabName+" SET "+columnNameSet+" = '"+value+"' WHERE "+columnID+" = '"+ident+"'");
             statement.close();
             connection.close();
-            JOptionPane.showMessageDialog(mainPanel,"Данные успешно обновлены");
         }catch (SQLException e) {
             JOptionPane.showMessageDialog(mainPanel,"Ошибка добавления данных в БД\n"+e);
         }
     }
 
-    private static String getValueFromDB(String sql, JPanel mainPanel){
+    private static Object getValueFromDB(String columnName, String tabName, String columnID,Object sql, JPanel mainPanel){
         String value;
         try {
             Connection connection = DriverManager.getConnection("jdbc:sqlite:FinDep.db");
             Statement statement = connection.createStatement();
-            ResultSet rs = statement.executeQuery("SELECT Value FROM Settings WHERE TypeSettings = '"+sql+"'");
-            value = rs.getString("Value");
+            ResultSet rs = statement.executeQuery("SELECT "+columnName+" FROM "+tabName+" WHERE "+columnID+" = '"+sql+"'");
+            value = rs.getString(columnName);
             statement.close();
             connection.close();
         }catch (SQLException e) {
@@ -328,5 +442,22 @@ public final class RS extends GridBagConstraints {
             JOptionPane.showMessageDialog(mainPanel,"Ошибка получения данных с БД\n"+e);
         }
         return value;
+    }
+    private static byte[] readFile(String file) {
+        ByteArrayOutputStream bos = null;
+        try {
+            File f = new File(file);
+            FileInputStream fis = new FileInputStream(f);
+            byte[] buffer = new byte[1024];
+            bos = new ByteArrayOutputStream();
+            for (int len; (len = fis.read(buffer)) != -1;) {
+                bos.write(buffer, 0, len);
+            }
+        } catch (FileNotFoundException e) {
+            System.err.println(e.getMessage());
+        } catch (IOException e2) {
+            System.err.println(e2.getMessage());
+        }
+        return bos != null ? bos.toByteArray() : null;
     }
 }

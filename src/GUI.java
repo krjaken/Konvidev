@@ -10,7 +10,7 @@ public class GUI extends JFrame {
 
     Settings settings = new Settings();
     PP pp = new PP(GUI.this);
-    Log log = new Log();
+    Log log = new Log(GUI.this);
 
     public GUI() throws ParseException {
 

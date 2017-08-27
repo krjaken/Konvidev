@@ -3,12 +3,13 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import javax.swing.*;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 public class DownloadKUR {
     public String[][] DownloadKUR(String data, JPanel mainPane) throws IOException {
         Document doc = Jsoup.connect(RS.getURLforCurDB(mainPane)+data).get();
-        RS.setTextLog(RS.getURLforCurDB(mainPane)+data);
+        RS.setURLCurrLog(RS.getURLforCurDB(mainPane)+data,mainPane);
         Elements tdElements = doc.getElementsByClass("data");
 
         String html = String.valueOf(tdElements);
@@ -28,7 +29,16 @@ public class DownloadKUR {
                 kurr[i][t] = ttt[t];
             }
         }
-        RS.setTextLog(kurr);
+
+        String kurrLog="";
+        for (int i=0;i<kurr.length;i++){
+            for (int ii=0;ii<kurr[0].length;ii++){
+                kurrLog=kurrLog+kurr[i][ii]+";";
+            }
+            kurrLog=kurrLog+"\n";
+        }
+
+        RS.setCurrListLog(kurrLog,mainPane);
         return kurr;
     }
 }
