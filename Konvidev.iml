@@ -27,15 +27,6 @@
     </orderEntry>
     <orderEntry type="module-library" exported="">
       <library>
-        <CLASSES />
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://D:/source/jsoup-1.10.3-sources.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" exported="">
-      <library>
         <CLASSES>
           <root url="jar://C:/sqlite/sqlite-jdbc-3.18.0.jar!/" />
         </CLASSES>

@@ -21,6 +21,7 @@ public class PP extends JPanel {
     private JButton jbDownloadCSV = new JButton("Download CSV");
     private JButton jbUpdateKur = new JButton("Загрузить курсы");
     private JButton jbOpering = new JButton("Обработать");
+    private JButton jbExportCSV = new JButton("Скачать отчет для 1С (csv)");
     private JPanel jpDownload = new JPanel(new GridBagLayout());
     private JPanel jpUpdate = new JPanel(new GridBagLayout());
     private JPanel jpOpering = new JPanel(new GridBagLayout());
@@ -80,7 +81,6 @@ public class PP extends JPanel {
         jbUpdateKur.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                RS.addTimeStampLog(new JPanel());
                 try {
                     Visual(new DownloadKUR().DownloadKUR(DateK.getText(),PP.this),mainFrame);
                     jpUpdate.removeAll();
@@ -89,8 +89,8 @@ public class PP extends JPanel {
                     mainFrame.repaint();
                     jbDownloadCSV.setVisible(true);
                     jpDownload.setVisible(true);
-                } catch (IOException e1) {
-                    e1.printStackTrace();
+                } catch (Exception e1) {
+                    JOptionPane.showMessageDialog(PP.this,"Не указана дата курса или URL\n"+e1);
                 }
             }
         });
@@ -101,6 +101,14 @@ public class PP extends JPanel {
                 Invoice(mainFrame);
             }
         });
+
+        jbExportCSV.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+            }
+        });
+
         RS.addComponent(jpKur,jScrollPane,new Rectangle(0,0,1,1),GridBagConstraints.CENTER,GridBagConstraints.BOTH);
         RS.addComponent(jpFirstDate,new JPanel(),new Rectangle(0,0,1,1),GridBagConstraints.EAST,GridBagConstraints.HORIZONTAL);
         RS.addComponent(jpFirstDate,DateK,new Rectangle(1,0,1,1),GridBagConstraints.EAST,GridBagConstraints.NONE);
@@ -361,7 +369,9 @@ public class PP extends JPanel {
 
         //прорисовываем на фрейме результат расчета
         jpBasikDate.removeAll();
-        RS.addComponent(jpBasikDate,jtInvoice,new Rectangle(0,0,1,1),GridBagConstraints.CENTER,GridBagConstraints.BOTH);
+        RS.addComponent(jpBasikDate,jtInvoice,new Rectangle(0,0,2,1),GridBagConstraints.CENTER,GridBagConstraints.BOTH);
+        RS.addComponent(jpBasikDate,new JPanel(),new Rectangle(0,1,1,1),GridBagConstraints.EAST,GridBagConstraints.HORIZONTAL);
+        RS.addComponent(jpBasikDate, jbExportCSV,new Rectangle(1,1,1,1),GridBagConstraints.WEST,GridBagConstraints.NONE);
         mainFrame.revalidate();
         mainFrame.repaint();
     }
