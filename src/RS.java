@@ -53,12 +53,138 @@ public final class RS extends GridBagConstraints {
                         "VALUES ('"+s+"', '0',0);";
                 statement.executeUpdate(sql) ;
             }
+
+            sql = "CREATE TABLE Proekts "+
+                    "(NameFromCSV TEXT PRIMARY KEY, "+
+                    "IDProekt TEXT, "+
+                    "NameOfProekt TEXT, "+
+                    "NameOfProekt1C TEXT, "+
+                    "TypeOfProject TEXT)";
+            statement.executeUpdate(sql);
+
             statement.close();
             connection.close();
         } catch (SQLException e) {
 
         }
     }
+
+    /*
+    Геттеры и сетеры для БД таблица Proekts
+     */
+
+    public static void addNameFromCSV(String value, JPanel mainPane){
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:sqlite:FinDep.db");
+            Statement statement = connection.createStatement();
+            if (value.contains("http")){
+                String sql = "INSERT INTO Proekts (NameFromCSV,IDProekt,NameOfProekt,NameOfProekt1C,TypeOfProject) " +
+                        "VALUES ('"+value+"', '-', '-', '-', '-');";
+                statement.executeUpdate(sql) ;
+                String tr = value.substring(value.indexOf('(') + 1, value.indexOf(')'));
+                RS.setNameOfProekt(tr,value,mainPane);
+
+                tr = value.substring(value.indexOf('[') + 1, value.indexOf(']'));
+                RS.setIDProekt(tr,value,mainPane);
+
+            }
+
+        } catch (SQLException e) {
+        }
+    }
+
+    public static void setIDProekt(String value, String ident, JPanel mainPanel){
+        String columnNameSet ="IDProekt";
+        updateValueInDB("Proekts",columnNameSet,value,"NameFromCSV",ident,mainPanel);
+    }
+
+    public static void setNameOfProekt(String value, String ident, JPanel mainPanel){
+        String columnNameSet ="NameOfProekt";
+        updateValueInDB("Proekts",columnNameSet,value,"NameFromCSV",ident,mainPanel);
+    }
+
+    public static void setNameOfProekt1C(String value, String ident, JPanel mainPanel){
+        String columnNameSet ="NameOfProekt1C";
+        updateValueInDB("Proekts",columnNameSet,value,"NameFromCSV",ident,mainPanel);
+    }
+
+    public static void setTypeOfProject(String value, String ident, JPanel mainPanel){
+        String columnNameSet ="TypeOfProject";
+        updateValueInDB("Proekts",columnNameSet,value,"NameFromCSV",ident,mainPanel);
+    }
+
+
+
+    public static ResultSet getNameFromCSVAll(){
+        ResultSet value;
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:sqlite:FinDep.db");
+            Statement statement = connection.createStatement();
+            value = statement.executeQuery("SELECT NameFromCSV FROM Proekts");
+            statement.close();
+            connection.close();
+        }catch (SQLException e) {
+            value = null;
+            JOptionPane.showMessageDialog(new JPanel(),"Ошибка получения данных с БД\n"+e);
+        }
+        return value;
+
+    }
+
+    public static String getIDProekt(String ident, JPanel mainPane){
+        String columnName = "IDProekt";
+        String result;
+        try {
+            result = (String) getValueFromDB(columnName, "Proekts", "NameFromCSV", ident, mainPane);
+        }catch (Exception e){
+            result = "";
+            JOptionPane.showMessageDialog(mainPane,"Непредвиденная ошибка БД\n"+e);
+        }
+        return result;
+    }
+
+    public static String getNameOfProekt(String ident, JPanel mainPane){
+        String columnName = "NameOfProekt";
+        String result;
+        try {
+            result = (String) getValueFromDB(columnName, "Proekts", "NameFromCSV", ident, mainPane);
+        }catch (Exception e){
+            result = "";
+            JOptionPane.showMessageDialog(mainPane,"Непредвиденная ошибка БД\n"+e);
+        }
+        return result;
+    }
+
+    public static String getNameOfProekt1C(String ident, JPanel mainPane){
+        String columnName = "NameOfProekt1C";
+        String result;
+        try {
+            result = (String) getValueFromDB(columnName, "Proekts", "NameFromCSV", ident, mainPane);
+        }catch (Exception e){
+            result = "";
+            JOptionPane.showMessageDialog(mainPane,"Непредвиденная ошибка БД\n"+e);
+        }
+        return result;
+    }
+
+    public static String getTypeOfProject(String ident, JPanel mainPane){
+        String columnName = "TypeOfProject";
+        String result;
+        try {
+            result = (String) getValueFromDB(columnName, "Proekts", "NameFromCSV", ident, mainPane);
+        }catch (Exception e){
+            result = "";
+            JOptionPane.showMessageDialog(mainPane,"Непредвиденная ошибка БД\n"+e);
+        }
+        return result;
+    }
+
+
+
+
+    /*
+    Геттеры и сетеры для БД таблица Log
+     */
 
     public static void setURLCurrLog(String value, JPanel mainPanel){
         String columnNameSet ="URLCurr";
@@ -93,9 +219,16 @@ public final class RS extends GridBagConstraints {
         String columnNameSet = "ConverCurrList";
         updateValueInDB("Log",columnNameSet,value,"TimeStamp",timestamp,mainPanel);
     }
-    public static Object getConverCurrListLog(JPanel mainPane){
-        String sql = "ConverCurrList";
-        return "";
+    public static Object getConverCurrListLog(Timestamp timestamp, JPanel mainPane){
+        String columnName = "ConverCurrList";
+        String result;
+        try {
+            result = (String) getValueFromDB(columnName, "Log", "TimeStamp",timestamp, mainPane);
+        }catch (Exception e){
+            result = "";
+            JOptionPane.showMessageDialog(mainPane,"Непредвиденная ошибка БД\n"+e);
+        }
+        return result;
     }
 
     public static void updateFileLog(String filename, JPanel mainPane) {
@@ -111,14 +244,12 @@ public final class RS extends GridBagConstraints {
             // set parameters
             pstmt.setBytes(1, readFile(filename));
             pstmt.executeUpdate();
-            System.out.println("Stored the file in the BLOB column.");
-
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            JOptionPane.showMessageDialog(mainPane,"Ошибка обновления файла лога\n"+e);
         }
     }
 
-    public static Object getFileCSVLog(JPanel mainPane){
+    public static Object getFileCSVLog(Timestamp timestamp, JPanel mainPane){
         String sql = "FileCSV";
         return "";
     }
@@ -126,7 +257,7 @@ public final class RS extends GridBagConstraints {
         String columnNameSet ="PartnersGroup";
         updateValueInDB("Log",columnNameSet,value,"TimeStamp",timestamp,mainPanel);
     }
-    public static Object getPartnersGroupLog(JPanel mainPane){
+    public static Object getPartnersGroupLog(Timestamp timestamp, JPanel mainPane){
         String sql = "PartnersGroup";
         return "";
     }
@@ -134,7 +265,7 @@ public final class RS extends GridBagConstraints {
         String columnNameSet = "PartnersSum";
         updateValueInDB("Log",columnNameSet,value,"TimeStamp",timestamp,mainPanel);
     }
-    public static Object getPartnersSumLog(JPanel mainPane){
+    public static Object getPartnersSumLog(Timestamp timestamp, JPanel mainPane){
         String sql = "PartnersSum";
         return "";
     }
@@ -150,7 +281,7 @@ public final class RS extends GridBagConstraints {
         String columnNameSet = "ResultCSV";
         updateValueInDB("Log",columnNameSet,value,"TimeStamp",timestamp,mainPanel);
     }
-    public static Object getResultCSVLog(JPanel mainPane){
+    public static Object getResultCSVLog(Timestamp timestamp, JPanel mainPane){
         String sql = "ResultCSV";
         return "";
     }
@@ -159,7 +290,6 @@ public final class RS extends GridBagConstraints {
             Connection connection = DriverManager.getConnection("jdbc:sqlite:FinDep.db");
             Statement statement = connection.createStatement();
             timestamp = new Timestamp(System.currentTimeMillis());
-            System.out.println(timestamp);
             String sql = "INSERT INTO Log (TimeStamp, URLCurr, CurrList, ConverCurrList, FileCSV, PartnersGroup, PartnersSum, Result, ResultCSV) " +
                     "VALUES ('"+timestamp+"', '-', '-', '-', '-', '-', '-', '-', '-');";
             statement.executeUpdate(sql) ;
@@ -167,73 +297,15 @@ public final class RS extends GridBagConstraints {
             e.printStackTrace();
         }
     }
-    public static Timestamp getTimeStampLog(String sql, JPanel mainPane){
-        String columnName = "TimeStamp";
-        Timestamp timestamp1 = null;
-        try {
-            timestamp1 = (Timestamp) getValueFromDB(columnName,"Log",columnName,sql,mainPane);
-        }catch (Exception e){
-            JOptionPane.showMessageDialog(mainPane,"Непредвиденная ошибка БД\n"+e);
-        }
-        return timestamp1;
+    public static Timestamp getCurrencyTimeStampLog(){
+        return timestamp;
     }
 
-    public static void addComponent(Container main, JComponent component, Rectangle location, int anchor, int fill) {
-        addComponent(main, component, location, anchor, fill, new Insets(0, 0, 0, 0));
-    }
 
-    public static void addComponent(Container main, JComponent component, Rectangle location, int anchor, int fill, Insets insets) {
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = location.x;
-        gbc.gridy = location.y;
-        gbc.gridwidth = location.width;
-        gbc.gridheight = location.height;
-        gbc.ipadx = 0;
-        gbc.ipady = 0;
-        gbc.weightx = (fill == GridBagConstraints.BOTH || fill == GridBagConstraints.HORIZONTAL) ? 1.0 : 0.0;
-        gbc.weighty = (fill == GridBagConstraints.BOTH || fill == GridBagConstraints.VERTICAL) ? 1.0 : 0.0;
-        gbc.anchor = anchor;
-        gbc.fill = fill;
-        gbc.insets = insets;
-        main.add(component, gbc);
-    }
+    /*
+    Геттеры и сетеры для БД таблица Settings
+    */
 
-    public static String FifeChoose(JFrame frame, String dialog, String currentDir, String fileFilter, String ff){
-
-        JFileChooser fileChooser = new JFileChooser();
-        try {
-            fileChooser.setCurrentDirectory(new File(currentDir));
-        }catch (Exception e){
-            JOptionPane.showMessageDialog(frame,"Ошибка выбора файла: "+dialog+"\n Ошибка: "+e);
-        }
-
-        FileNameExtensionFilter filter = new FileNameExtensionFilter(fileFilter,ff);
-        fileChooser.setDialogTitle(dialog);
-        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        fileChooser.showOpenDialog(null);
-        //fileChooser.setFileFilter(filter);
-        String string ="";
-        //if (fileChooser.showOpenDialog(JFileChooser.APPROVE_OPTION)=="open")
-        return fileChooser.getSelectedFile().getAbsolutePath();
-    }
-    public String DirectoriChoose(String dialog, String dataSQL){
-        String temp ="";
-
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setCurrentDirectory(new File("C:\\Users\\12\\Desktop\\конвидев"));
-        fileChooser.setDialogTitle(dialog);
-        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        fileChooser.showOpenDialog(null);
-
-        temp ="";
-        //if (fileChooser.showOpenDialog(JFileChooser.APPROVE_OPTION)=="open")
-
-        return fileChooser.getSelectedFile().getAbsolutePath();
-    }
-
-    public static void setTextLog(Double dt){
-        //сюда пишем заполнения лога
-    }
 
     public static void setFeeParsentDB(String value, JPanel mainPanel){
         Double dt=0.00;
@@ -412,6 +484,69 @@ public final class RS extends GridBagConstraints {
         String result= (String) getValueFromDB("Value", "Settings", "TypeSettings",sql,mainPane);
         return result;
     }
+
+
+    /*
+    Методы добавляющие компоненты на компоненты на базе GridBagLayout, а также методы выбора файлов и директории для сохранения
+     */
+
+    public static void addComponent(Container main, JComponent component, Rectangle location, int anchor, int fill) {
+        addComponent(main, component, location, anchor, fill, new Insets(0, 0, 0, 0));
+    }
+
+    public static void addComponent(Container main, JComponent component, Rectangle location, int anchor, int fill, Insets insets) {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = location.x;
+        gbc.gridy = location.y;
+        gbc.gridwidth = location.width;
+        gbc.gridheight = location.height;
+        gbc.ipadx = 0;
+        gbc.ipady = 0;
+        gbc.weightx = (fill == GridBagConstraints.BOTH || fill == GridBagConstraints.HORIZONTAL) ? 1.0 : 0.0;
+        gbc.weighty = (fill == GridBagConstraints.BOTH || fill == GridBagConstraints.VERTICAL) ? 1.0 : 0.0;
+        gbc.anchor = anchor;
+        gbc.fill = fill;
+        gbc.insets = insets;
+        main.add(component, gbc);
+    }
+
+    public static String FifeChoose(JFrame frame, String dialog, String currentDir, String fileFilter, String ff){
+
+        JFileChooser fileChooser = new JFileChooser();
+        try {
+            fileChooser.setCurrentDirectory(new File(currentDir));
+        }catch (Exception e){
+            JOptionPane.showMessageDialog(frame,"Ошибка выбора файла: "+dialog+"\n Ошибка: "+e);
+        }
+
+        FileNameExtensionFilter filter = new FileNameExtensionFilter(fileFilter,ff);
+        fileChooser.setDialogTitle(dialog);
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fileChooser.showOpenDialog(null);
+        //fileChooser.setFileFilter(filter);
+        String string ="";
+        //if (fileChooser.showOpenDialog(JFileChooser.APPROVE_OPTION)=="open")
+        return fileChooser.getSelectedFile().getAbsolutePath();
+    }
+    public String DirectoriChoose(String dialog, String dataSQL){
+        String temp ="";
+
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(new File("C:\\Users\\12\\Desktop\\конвидев"));
+        fileChooser.setDialogTitle(dialog);
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fileChooser.showOpenDialog(null);
+
+        temp ="";
+        //if (fileChooser.showOpenDialog(JFileChooser.APPROVE_OPTION)=="open")
+
+        return fileChooser.getSelectedFile().getAbsolutePath();
+    }
+
+
+
+
+
     public static void setSettingsList(String temp){
         settingsList.add(temp);
     }

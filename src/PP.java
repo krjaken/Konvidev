@@ -21,11 +21,13 @@ public class PP extends JPanel {
     private JButton jbDownloadCSV = new JButton("Download CSV");
     private JButton jbUpdateKur = new JButton("Загрузить курсы");
     private JButton jbOpering = new JButton("Обработать");
-    private JButton jbExportCSV = new JButton("Скачать отчет для 1С (csv)");
+    private JButton jbExportCSV = new JButton("Сформировать (csv)");
     private JPanel jpDownload = new JPanel(new GridBagLayout());
     private JPanel jpUpdate = new JPanel(new GridBagLayout());
     private JPanel jpOpering = new JPanel(new GridBagLayout());
     String[][] konvidwvCSV;
+    Set<String> listCurr;
+    Double totalSummCalc=0.0;
     public Set<String> listProdavzov=new HashSet<String>();
     public Map<Object, JChekbox> mapLogic = new HashMap<Object, JChekbox>();
     JPanel jpSkroll = new JPanel(new GridBagLayout());
@@ -105,7 +107,7 @@ public class PP extends JPanel {
         jbExportCSV.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-
+                new Logic(mainFrame, konvidwvCSV, mapLogic,totalSummCalc, PP.this);
             }
         });
 
@@ -250,11 +252,12 @@ public class PP extends JPanel {
         }
 
 //Создаем список валют без дублей, что есть в исходном файле
-        Set<String> listCurr=new HashSet<String>();
+        listCurr=new HashSet<String>();
         for (int ttt=1; ttt<TotalCSV[0].length;ttt++){
             TotalCSV[0][ttt]= TotalCSV[0][ttt].replaceAll("In.","").replaceAll("Out.","");
             listCurr.add(TotalCSV[0][ttt]);
         }
+
 
 //Инициализируем массив в который поместим групированные продажи в разрезе продавцев и валют
         int oi=listCurr.size()+1;
@@ -356,6 +359,8 @@ public class PP extends JPanel {
         invoice[17+i][2]=new DecimalFormat("##########0.00").format(Pars(invoice[14+i][2])+Pars(invoice[15+i][2])+Pars(invoice[16+i][2]));
         invoice[18+i][0]="ИТОГО к оплате"; invoice[18+i][2]=new DecimalFormat("##,###,###,##0.00").format(Pars(invoice[17+i][2])+Pars(invoice[13+i][2]));
 
+        totalSummCalc = Pars(invoice[18+i][2]);
+
 //добавляем финальный результат в лог
         String result="";
         for (int t = 0;t<invoice.length;t++){
@@ -374,6 +379,7 @@ public class PP extends JPanel {
         RS.addComponent(jpBasikDate, jbExportCSV,new Rectangle(1,1,1,1),GridBagConstraints.WEST,GridBagConstraints.NONE);
         mainFrame.revalidate();
         mainFrame.repaint();
+
     }
 //Метод парсинга данный расчета
     private double Pars(String temp){

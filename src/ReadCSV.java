@@ -48,6 +48,9 @@ public class ReadCSV {
                         }
                         mass[i][j] = data[r];
                         mass[i][j]=mass[i][j].replaceAll("\"", "").replaceAll(" ","").replaceAll(",",".");
+                        if (j==1){
+                            RS.addNameFromCSV(mass[i][j],new JPanel());
+                        }
                         j++;
                     }
                 }

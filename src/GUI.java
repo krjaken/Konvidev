@@ -1,5 +1,3 @@
-import com.sun.xml.internal.ws.api.config.management.policy.ManagementAssertion;
-
 import javax.swing.*;
 import java.awt.*;
 import java.text.ParseException;
@@ -9,6 +7,7 @@ public class GUI extends JFrame {
     private JTabbedPane jTabbedPane = new JTabbedPane();
 
     Settings settings = new Settings();
+    Proekts proekts = new Proekts();
     PP pp = new PP(GUI.this);
     Log log = new Log(GUI.this);
 
@@ -18,6 +17,7 @@ public class GUI extends JFrame {
         setLocation(100,100);
 
         jTabbedPane.addTab("PP",pp);
+        jTabbedPane.add("Данные проектов",proekts);
         jTabbedPane.addTab("Log",log);
         jTabbedPane.addTab("Settings",settings);
         RS.addComponent(panel,jTabbedPane,new Rectangle(0,0,1,1),GridBagConstraints.WEST,GridBagConstraints.BOTH);
@@ -27,6 +27,5 @@ public class GUI extends JFrame {
         setMinimumSize(new Dimension(800,800));
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
-
     }
 }
