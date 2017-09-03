@@ -277,7 +277,7 @@ public final class RS extends GridBagConstraints {
         String sql = "Result";
         return "";
     }
-    public static void setResultCSVLog(File value, JPanel mainPanel){
+    public static void setResultCSVLog(String value, JPanel mainPanel){
         String columnNameSet = "ResultCSV";
         updateValueInDB("Log",columnNameSet,value,"TimeStamp",timestamp,mainPanel);
     }
@@ -528,7 +528,7 @@ public final class RS extends GridBagConstraints {
         //if (fileChooser.showOpenDialog(JFileChooser.APPROVE_OPTION)=="open")
         return fileChooser.getSelectedFile().getAbsolutePath();
     }
-    public String DirectoriChoose(String dialog, String dataSQL){
+    public static String DirectoriChoose(String dialog, String dataSQL){
         String temp ="";
 
         JFileChooser fileChooser = new JFileChooser();

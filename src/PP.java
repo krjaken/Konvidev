@@ -107,7 +107,7 @@ public class PP extends JPanel {
         jbExportCSV.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                new Logic(mainFrame, konvidwvCSV, mapLogic,totalSummCalc, PP.this);
+                new Logic(mainFrame, konvidwvCSV, mapLogic,totalSummCalc);
             }
         });
 

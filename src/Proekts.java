@@ -5,12 +5,18 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.*;
 
+import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
+
 public class Proekts extends JPanel {
     JPanel panel = new JPanel(new GridBagLayout());
     JScrollPane scrollPane = new JScrollPane(panel);
+    JButton button = new JButton("Загрузить csv");
     public Proekts(){
         setLayout(new GridBagLayout());
-        RS.addComponent(Proekts.this,scrollPane,new Rectangle(0,0,1,1),GridBagConstraints.WEST,GridBagConstraints.BOTH);
+        RS.addComponent(Proekts.this,new JLabel("импортировать названия проектов для 1С из csv"),new Rectangle(0,0,1,1),GridBagConstraints.WEST,GridBagConstraints.NONE, new Insets(0,5,0,0));
+        RS.addComponent(Proekts.this,button,new Rectangle(1,0,1,1),GridBagConstraints.WEST,GridBagConstraints.NONE, new Insets(0,5,0,0));
+        RS.addComponent(Proekts.this,new JPanel(),new Rectangle(2,0,1,1),GridBagConstraints.WEST,GridBagConstraints.HORIZONTAL);
+        RS.addComponent(Proekts.this,scrollPane,new Rectangle(0,1,3,1),GridBagConstraints.WEST,GridBagConstraints.BOTH);
         try {
             Connection connection = DriverManager.getConnection("jdbc:sqlite:FinDep.db");
             Statement statement = connection.createStatement();
@@ -26,8 +32,65 @@ public class Proekts extends JPanel {
         }catch (SQLException e){
             JOptionPane.showMessageDialog(Proekts.this, "Ошибка заполнения списка проектов\n" +e);
         }
+        button.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                importDataOfProekts();
+            }
+        });
 
 
+    }
+    private void importDataOfProekts(){
+        JDialog dialog = new JDialog();
+        JPanel contentPanel = new JPanel(new GridBagLayout());
+        JComboBox nameCSV = creatJCombobox(); JComboBox id = creatJCombobox();
+        JComboBox url = creatJCombobox(); JComboBox name1C = creatJCombobox();
+        JComboBox type = creatJCombobox(); JButton downloadButton = new JButton("Загрузить csv");
+        JTextField textField = new JTextField(";");
+        textField.setPreferredSize(new Dimension(200,30));
+        dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        dialog.setTitle("Импорт данных по проектам из (csv)");
+        dialog.setModal(true);
+
+        RS.addComponent(contentPanel, new JLabel("Соотношение колонок csv файла к данным проектов"),new Rectangle(0,0,2,1),GridBagConstraints.CENTER,GridBagConstraints.NONE, new Insets(0,5,10,0));
+        RS.addComponent(contentPanel,new JLabel("Полное название проекта с 1GP (Paymantix)"),new Rectangle(0,1,1,1),GridBagConstraints.WEST,GridBagConstraints.NONE, new Insets(0,5,0,0));
+        RS.addComponent(contentPanel,nameCSV,new Rectangle(1,1,1,1),GridBagConstraints.WEST,GridBagConstraints.HORIZONTAL, new Insets(0,5,0,0));
+        RS.addComponent(contentPanel,new JLabel("ID Проекта"),new Rectangle(0,2,1,1),GridBagConstraints.WEST,GridBagConstraints.NONE, new Insets(0,5,0,0));
+        RS.addComponent(contentPanel,id,new Rectangle(1,2,1,1),GridBagConstraints.WEST,GridBagConstraints.HORIZONTAL, new Insets(0,5,0,0));
+        RS.addComponent(contentPanel,new JLabel("Сайт проекта"),new Rectangle(0,3,1,1),GridBagConstraints.WEST,GridBagConstraints.NONE, new Insets(0,5,0,0));
+        RS.addComponent(contentPanel,url,new Rectangle(1,3,1,1),GridBagConstraints.WEST,GridBagConstraints.HORIZONTAL, new Insets(0,5,0,0));
+        RS.addComponent(contentPanel,new JLabel("Название проекта 1С"),new Rectangle(0,4,1,1),GridBagConstraints.WEST,GridBagConstraints.NONE, new Insets(0,5,0,0));
+        RS.addComponent(contentPanel,name1C,new Rectangle(1,4,1,1),GridBagConstraints.WEST,GridBagConstraints.HORIZONTAL, new Insets(0,5,0,0));
+        RS.addComponent(contentPanel,new JLabel("Тип проекта"),new Rectangle(0,5,1,1),GridBagConstraints.WEST,GridBagConstraints.NONE, new Insets(0,5,0,0));
+        RS.addComponent(contentPanel,type,new Rectangle(1,5,1,1),GridBagConstraints.WEST,GridBagConstraints.HORIZONTAL, new Insets(0,5,0,0));
+
+        RS.addComponent(contentPanel,new JLabel("Разделитель значений: "),new Rectangle(0,6,1,1),GridBagConstraints.WEST,GridBagConstraints.NONE, new Insets(0,5,0,0));
+        RS.addComponent(contentPanel,textField,new Rectangle(1,6,2,1),GridBagConstraints.WEST,GridBagConstraints.HORIZONTAL, new Insets(0,5,0,0));
+
+        RS.addComponent(contentPanel,new JPanel(),new Rectangle(0,7,2,1),GridBagConstraints.WEST,GridBagConstraints.BOTH, new Insets(0,5,0,0));
+        RS.addComponent(contentPanel,downloadButton,new Rectangle(0,8,1,1),GridBagConstraints.WEST,GridBagConstraints.NONE, new Insets(0,5,0,0));
+        RS.addComponent(contentPanel,new JPanel(),new Rectangle(1,8,1,1),GridBagConstraints.WEST,GridBagConstraints.NONE, new Insets(0,5,0,0));
+
+
+
+        dialog.add(contentPanel);
+        dialog.pack();
+        //dialog.setLocation(frame.getX()+100,frame.getY()+100);
+        dialog.setSize(450,400);
+        dialog.setResizable(false);
+        dialog.setVisible(true);
+        dialog.revalidate();
+        dialog.repaint();
+    }
+    private JComboBox creatJCombobox(){
+        JComboBox comboBox = new JComboBox();
+        comboBox.addItem("1");comboBox.addItem("2");comboBox.addItem("3");
+        comboBox.addItem("4");comboBox.addItem("5");comboBox.addItem("не определено");
+        comboBox.setSelectedIndex(5);
+        comboBox.setPreferredSize(new Dimension(200,30));
+
+        return comboBox;
     }
 }
 class OneProekt extends JPanel{
