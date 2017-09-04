@@ -166,7 +166,7 @@ public class Logic {
             public void mousePressed(MouseEvent e) {
                 System.out.println("нажато тык");
                 calc();
-                new SaveCSV(RS.DirectoriChoose("suhfkjhfjsk","sjkhbvfsj"), fileCSV, (String) coding.getSelectedItem());
+                new SaveCSV(RS.DirectoriChoose("Отчет для 1С",""),"paymantix.csv", fileCSV, (String) coding.getSelectedItem());
                 dialog.dispose();
             }
         });

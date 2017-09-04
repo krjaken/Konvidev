@@ -3,8 +3,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class SaveCSV {
-    public SaveCSV(String adress, String file, String charset){
-        try(FileOutputStream fos=new FileOutputStream(adress+"//paymantix.csv"))
+    public SaveCSV(String adress,String nameOfFile, String file, String charset){
+        try(FileOutputStream fos=new FileOutputStream(adress+"//"+nameOfFile))
         {
             // перевод строки в байты
             byte[] buffer = file.getBytes();

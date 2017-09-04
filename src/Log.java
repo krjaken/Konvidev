@@ -162,7 +162,7 @@ public class Log extends JPanel {
                 for (Map.Entry<String, String> entry : mapDate.entrySet()) {
                     RS.addComponent(panelDate, new JLabel(entry.getKey()), new Rectangle(0, i, 1, 1), GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 10, 5, 30));
                     RS.addComponent(panelDate, new JButton("Показать"), new Rectangle(1, i, 1, 1), GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 10, 5, 30));
-                    RS.addComponent(panelDate, new JButton("Скачать"), new Rectangle(2, i, 1, 1), GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 10, 5, 30));
+                    RS.addComponent(panelDate, createButtunSave(entry.getKey(),entry.getValue()), new Rectangle(2, i, 1, 1), GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 10, 5, 30));
                     RS.addComponent(panelDate, new JLabel(), new Rectangle(3, i, 1, 1), GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL);
                     i++;
                 }
@@ -228,6 +228,23 @@ public class Log extends JPanel {
                 RS.addComponent(panel, new JPanel(), new Rectangle(2, 0, 1, 1), GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL);
                 RS.addComponent(panel, panelDate, new Rectangle(0, 1, 3, 1), GridBagConstraints.SOUTH, GridBagConstraints.BOTH);
 
+            }
+            public JButton createButtunSave(String nameOfFile, String file){
+                JButton button = new JButton("Скачать");
+                button.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        new SaveCSV(RS.DirectoriChoose("Адрес сохранения отчета",""),nameOfFile+".csv",file,"UTF-8");
+                        JOptionPane.showMessageDialog(new JPanel(), "Файл успешно сохранен");
+                    }
+                });
+
+                return button;
+            }
+            public JButton createButtunViev(String name){
+                JButton button = new JButton(name);
+
+                return button;
             }
         }
     }

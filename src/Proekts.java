@@ -3,15 +3,23 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.sql.*;
 
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 
 public class Proekts extends JPanel {
+    JFrame mainFrame;
     JPanel panel = new JPanel(new GridBagLayout());
     JScrollPane scrollPane = new JScrollPane(panel);
     JButton button = new JButton("Загрузить csv");
-    public Proekts(){
+    JComboBox nameCSV = creatJCombobox(); JComboBox id = creatJCombobox();
+    JComboBox url = creatJCombobox(); JComboBox name1C = creatJCombobox();
+    JComboBox type = creatJCombobox();JButton downloadButton = new JButton("Загрузить csv");
+    JComboBox rove = new JComboBox();
+    String[][] updateProektCSV;
+    public Proekts(JFrame mainFrame){
+        this.mainFrame = mainFrame;
         setLayout(new GridBagLayout());
         RS.addComponent(Proekts.this,new JLabel("импортировать названия проектов для 1С из csv"),new Rectangle(0,0,1,1),GridBagConstraints.WEST,GridBagConstraints.NONE, new Insets(0,5,0,0));
         RS.addComponent(Proekts.this,button,new Rectangle(1,0,1,1),GridBagConstraints.WEST,GridBagConstraints.NONE, new Insets(0,5,0,0));
@@ -44,9 +52,10 @@ public class Proekts extends JPanel {
     private void importDataOfProekts(){
         JDialog dialog = new JDialog();
         JPanel contentPanel = new JPanel(new GridBagLayout());
-        JComboBox nameCSV = creatJCombobox(); JComboBox id = creatJCombobox();
-        JComboBox url = creatJCombobox(); JComboBox name1C = creatJCombobox();
-        JComboBox type = creatJCombobox(); JButton downloadButton = new JButton("Загрузить csv");
+
+        rove.setPreferredSize(new Dimension(200,30));
+        rove.addItem("1");rove.addItem("2");
+        rove.setSelectedIndex(0);
         JTextField textField = new JTextField(";");
         textField.setPreferredSize(new Dimension(200,30));
         dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -64,19 +73,38 @@ public class Proekts extends JPanel {
         RS.addComponent(contentPanel,name1C,new Rectangle(1,4,1,1),GridBagConstraints.WEST,GridBagConstraints.HORIZONTAL, new Insets(0,5,0,0));
         RS.addComponent(contentPanel,new JLabel("Тип проекта"),new Rectangle(0,5,1,1),GridBagConstraints.WEST,GridBagConstraints.NONE, new Insets(0,5,0,0));
         RS.addComponent(contentPanel,type,new Rectangle(1,5,1,1),GridBagConstraints.WEST,GridBagConstraints.HORIZONTAL, new Insets(0,5,0,0));
+        RS.addComponent(contentPanel,new JLabel("Данные со строки №"),new Rectangle(0,6,1,1),GridBagConstraints.WEST,GridBagConstraints.NONE, new Insets(0,5,0,0));
+        RS.addComponent(contentPanel,rove,new Rectangle(1,6,1,1),GridBagConstraints.WEST,GridBagConstraints.HORIZONTAL, new Insets(0,5,0,0));
 
-        RS.addComponent(contentPanel,new JLabel("Разделитель значений: "),new Rectangle(0,6,1,1),GridBagConstraints.WEST,GridBagConstraints.NONE, new Insets(0,5,0,0));
-        RS.addComponent(contentPanel,textField,new Rectangle(1,6,2,1),GridBagConstraints.WEST,GridBagConstraints.HORIZONTAL, new Insets(0,5,0,0));
+        RS.addComponent(contentPanel,new JLabel("Разделитель значений: "),new Rectangle(0,7,1,1),GridBagConstraints.WEST,GridBagConstraints.NONE, new Insets(0,5,0,0));
+        RS.addComponent(contentPanel,textField,new Rectangle(1,7,2,1),GridBagConstraints.WEST,GridBagConstraints.HORIZONTAL, new Insets(0,5,0,0));
 
-        RS.addComponent(contentPanel,new JPanel(),new Rectangle(0,7,2,1),GridBagConstraints.WEST,GridBagConstraints.BOTH, new Insets(0,5,0,0));
-        RS.addComponent(contentPanel,downloadButton,new Rectangle(0,8,1,1),GridBagConstraints.WEST,GridBagConstraints.NONE, new Insets(0,5,0,0));
-        RS.addComponent(contentPanel,new JPanel(),new Rectangle(1,8,1,1),GridBagConstraints.WEST,GridBagConstraints.NONE, new Insets(0,5,0,0));
+        RS.addComponent(contentPanel,new JPanel(),new Rectangle(0,8,2,1),GridBagConstraints.WEST,GridBagConstraints.BOTH, new Insets(0,5,0,0));
+        RS.addComponent(contentPanel,downloadButton,new Rectangle(0,9,1,1),GridBagConstraints.WEST,GridBagConstraints.NONE, new Insets(0,5,0,0));
+        RS.addComponent(contentPanel,new JPanel(),new Rectangle(1,9,1,1),GridBagConstraints.WEST,GridBagConstraints.NONE, new Insets(0,5,0,0));
 
+        downloadButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                try {
+                    if (nameCSV.getSelectedIndex()==5){
+                        JOptionPane.showMessageDialog(mainFrame,"Не выбрана колонка с именами проектов 1GP");
+                    }else {
+                        updateProektCSV = new ReadCSV().ReadCSV(RS.FifeChoose(mainFrame,"Загрузка CSV","","CSV","CSV")).clone();
+                        udateProektsFromCSV(updateProektCSV);
+                        dialog.dispose();
+                        JOptionPane.showMessageDialog(mainFrame,"Данные проектов обновлены успешно");
+                    }
+                } catch (IOException e1) {
+                    JOptionPane.showMessageDialog(mainFrame,"Ошибка загрузки файла\n"+e1);
+                }
+            }
+        });
 
 
         dialog.add(contentPanel);
         dialog.pack();
-        //dialog.setLocation(frame.getX()+100,frame.getY()+100);
+        dialog.setLocation(mainFrame.getX()+100,mainFrame.getY()+100);
         dialog.setSize(450,400);
         dialog.setResizable(false);
         dialog.setVisible(true);
@@ -91,6 +119,73 @@ public class Proekts extends JPanel {
         comboBox.setPreferredSize(new Dimension(200,30));
 
         return comboBox;
+    }
+    private void udateProektsFromCSV(String[][] mass){
+        if (id.getSelectedIndex()!=5){
+            ResultSet rs = RS.getNameFromCSVAll();
+            try {
+                while (rs.next()){
+                    String nameCSVString =rs.getString("NameFromCSV");
+                    for (int i=0;i<mass.length;i++){
+                        if (nameCSVString.equals(mass[i][nameCSV.getSelectedIndex()])){
+                            RS.setIDProekt(mass[i][id.getSelectedIndex()],nameCSVString,Proekts.this);
+                        }
+                    }
+
+                }
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(mainFrame,"Ошибка получения сверочной информации с БД\n"+e);
+            }
+        }
+        if (url.getSelectedIndex()!=5){
+            ResultSet rs = RS.getNameFromCSVAll();
+            try {
+                while (rs.next()){
+                    String nameCSVString =rs.getString("NameFromCSV");
+                    for (int i=0;i<mass.length;i++){
+                        if (nameCSVString.equals(mass[i][nameCSV.getSelectedIndex()])){
+                            RS.setNameOfProekt(mass[i][url.getSelectedIndex()],nameCSVString,Proekts.this);
+                        }
+                    }
+
+                }
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(mainFrame,"Ошибка получения сверочной информации с БД\n"+e);
+            }
+        }
+        if (name1C.getSelectedIndex()!=5){
+            ResultSet rs = RS.getNameFromCSVAll();
+            try {
+                while (rs.next()){
+                    String nameCSVString =rs.getString("NameFromCSV");
+                    for (int i=0;i<mass.length;i++){
+                        if (nameCSVString.equals(mass[i][nameCSV.getSelectedIndex()])){
+                            RS.setNameOfProekt1C(mass[i][name1C.getSelectedIndex()],nameCSVString,Proekts.this);
+                        }
+                    }
+
+                }
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(mainFrame,"Ошибка получения сверочной информации с БД\n"+e);
+            }
+
+        }
+        if (type.getSelectedIndex()!=5){
+            ResultSet rs = RS.getNameFromCSVAll();
+            try {
+                while (rs.next()){
+                    String nameCSVString =rs.getString("NameFromCSV");
+                    for (int i=0;i<mass.length;i++){
+                        if (nameCSVString.equals(mass[i][nameCSV.getSelectedIndex()])){
+                            RS.setTypeOfProject(mass[i][type.getSelectedIndex()],nameCSVString,Proekts.this);
+                        }
+                    }
+
+                }
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(mainFrame,"Ошибка получения сверочной информации с БД\n"+e);
+            }
+        }
     }
 }
 class OneProekt extends JPanel{

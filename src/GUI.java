@@ -7,7 +7,7 @@ public class GUI extends JFrame {
     private JTabbedPane jTabbedPane = new JTabbedPane();
 
     Settings settings = new Settings();
-    Proekts proekts = new Proekts();
+    Proekts proekts = new Proekts(GUI.this);
     PP pp = new PP(GUI.this);
     Log log = new Log(GUI.this);
 
