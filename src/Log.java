@@ -161,15 +161,13 @@ public class Log extends JPanel {
                 int i=0;
                 for (Map.Entry<String, String> entry : mapDate.entrySet()) {
                     RS.addComponent(panelDate, new JLabel(entry.getKey()), new Rectangle(0, i, 1, 1), GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 10, 5, 30));
-                    RS.addComponent(panelDate, new JButton("Показать"), new Rectangle(1, i, 1, 1), GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 10, 5, 30));
+                    RS.addComponent(panelDate, createButtunViev(entry.getValue(), entry.getKey()), new Rectangle(1, i, 1, 1), GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 10, 5, 30));
                     RS.addComponent(panelDate, createButtunSave(entry.getKey(),entry.getValue()), new Rectangle(2, i, 1, 1), GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 10, 5, 30));
                     RS.addComponent(panelDate, new JLabel(), new Rectangle(3, i, 1, 1), GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL);
                     i++;
                 }
 
                 RS.addComponent(panelDate,new Torte(mapDate.get("Информация по продавцам"),mapDate.get("Исходный файл (csv)")), new Rectangle(0, i, 4, 1), GridBagConstraints.NORTH, GridBagConstraints.BOTH);
-
-                final String loadString = "Сайт загрузки курса";
 
                 String html = "<html>" +
                         "<head>" +
@@ -241,8 +239,34 @@ public class Log extends JPanel {
 
                 return button;
             }
-            public JButton createButtunViev(String name){
-                JButton button = new JButton(name);
+            public JButton createButtunViev(String file, String name){
+                JPanel panel = new JPanel(new GridBagLayout());
+                JButton button = new JButton("Показать");
+                JTextArea textArea = new JTextArea(file);
+                textArea.setEditable(false);
+                JScrollPane scrollPane = new JScrollPane(textArea);
+                scrollPane.setMaximumSize(new Dimension(700,800));
+                panel.setMaximumSize(new Dimension(700,800));
+                RS.addComponent(panel, scrollPane, new Rectangle(0, 1, 3, 1), GridBagConstraints.CENTER, GridBagConstraints.BOTH);
+
+                button.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        JDialog dialog = new JDialog();
+                        dialog.setTitle(name);
+                        dialog.setSize(700,800);
+                        dialog.setMaximumSize(new Dimension(700,800));
+                        dialog.setResizable(false);
+                        dialog.setVisible(true);
+                        dialog.setModal(true);
+
+                        dialog.add(panel);
+                        dialog.pack();
+                        dialog.setVisible(true);
+                        dialog.revalidate();
+                        dialog.repaint();
+                    }
+                });
 
                 return button;
             }
