@@ -5,6 +5,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.sql.*;
+import java.util.LinkedList;
 
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 
@@ -90,7 +91,7 @@ public class Proekts extends JPanel {
                     if (nameCSV.getSelectedIndex()==5){
                         JOptionPane.showMessageDialog(mainFrame,"Не выбрана колонка с именами проектов 1GP");
                     }else {
-                        updateProektCSV = new ReadCSV().ReadCSV(RS.FifeChoose(mainFrame,"Загрузка CSV","","CSV","CSV")).clone();
+                        updateProektCSV = new ReadCSV().ReadCSV(RS.FifeChoose(mainFrame,"Загрузка CSV","","CSV","csv"));
                         udateProektsFromCSV(updateProektCSV);
                         dialog.dispose();
                         JOptionPane.showMessageDialog(mainFrame,"Данные проектов обновлены успешно");
@@ -121,69 +122,59 @@ public class Proekts extends JPanel {
         return comboBox;
     }
     private void udateProektsFromCSV(String[][] mass){
+
         if (id.getSelectedIndex()!=5){
-            ResultSet rs = RS.getNameFromCSVAll();
+            LinkedList<String> rs = RS.getNameFromCSVAll();
             try {
-                while (rs.next()){
-                    String nameCSVString =rs.getString("NameFromCSV");
+                for (String nameCSVString: rs){
                     for (int i=0;i<mass.length;i++){
                         if (nameCSVString.equals(mass[i][nameCSV.getSelectedIndex()])){
                             RS.setIDProekt(mass[i][id.getSelectedIndex()],nameCSVString,Proekts.this);
                         }
                     }
-
                 }
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(mainFrame,"Ошибка получения сверочной информации с БД\n"+e);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(mainFrame,"Ошибка получения сверочной информации\n"+e);
             }
-        }
-        if (url.getSelectedIndex()!=5){
-            ResultSet rs = RS.getNameFromCSVAll();
+        }else if (url.getSelectedIndex()!=5){
+            LinkedList<String> rs = RS.getNameFromCSVAll();
             try {
-                while (rs.next()){
-                    String nameCSVString =rs.getString("NameFromCSV");
+                for (String nameCSVString: rs){
                     for (int i=0;i<mass.length;i++){
                         if (nameCSVString.equals(mass[i][nameCSV.getSelectedIndex()])){
                             RS.setNameOfProekt(mass[i][url.getSelectedIndex()],nameCSVString,Proekts.this);
                         }
                     }
-
                 }
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(mainFrame,"Ошибка получения сверочной информации с БД\n"+e);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(mainFrame,"Ошибка получения сверочной информации\n"+e);
             }
-        }
-        if (name1C.getSelectedIndex()!=5){
-            ResultSet rs = RS.getNameFromCSVAll();
+        } else if (name1C.getSelectedIndex()!=5){
+            LinkedList<String> rs = RS.getNameFromCSVAll();
             try {
-                while (rs.next()){
-                    String nameCSVString =rs.getString("NameFromCSV");
+                for (String nameCSVString: rs){
                     for (int i=0;i<mass.length;i++){
                         if (nameCSVString.equals(mass[i][nameCSV.getSelectedIndex()])){
                             RS.setNameOfProekt1C(mass[i][name1C.getSelectedIndex()],nameCSVString,Proekts.this);
                         }
                     }
-
                 }
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(mainFrame,"Ошибка получения сверочной информации с БД\n"+e);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(mainFrame,"Ошибка получения сверочной информации\n"+e);
             }
 
-        }
-        if (type.getSelectedIndex()!=5){
-            ResultSet rs = RS.getNameFromCSVAll();
+        }else if (type.getSelectedIndex()!=5){
+            LinkedList<String> rs = RS.getNameFromCSVAll();
             try {
-                while (rs.next()){
-                    String nameCSVString =rs.getString("NameFromCSV");
+                for (String nameCSVString: rs){
                     for (int i=0;i<mass.length;i++){
                         if (nameCSVString.equals(mass[i][nameCSV.getSelectedIndex()])){
                             RS.setTypeOfProject(mass[i][type.getSelectedIndex()],nameCSVString,Proekts.this);
                         }
                     }
-
                 }
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(mainFrame,"Ошибка получения сверочной информации с БД\n"+e);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(mainFrame,"Ошибка получения сверочной информации\n"+e);
             }
         }
     }

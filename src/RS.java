@@ -4,6 +4,7 @@ import java.awt.*;
 import java.io.*;
 import java.sql.*;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 
 /**
  * Created by s.ivanov on 01.07.2017.
@@ -115,19 +116,21 @@ public final class RS extends GridBagConstraints {
 
 
 
-    public static ResultSet getNameFromCSVAll(){
-        ResultSet value;
+    public static LinkedList<String> getNameFromCSVAll(){
+        LinkedList<String> nameOfCSV = new LinkedList<String>();
         try {
             Connection connection = DriverManager.getConnection("jdbc:sqlite:FinDep.db");
             Statement statement = connection.createStatement();
-            value = statement.executeQuery("SELECT NameFromCSV FROM Proekts");
+            ResultSet value = statement.executeQuery("SELECT NameFromCSV FROM Proekts");
+            while (value.next()){
+                nameOfCSV.add(value.getString("NameFromCSV"));
+            }
             statement.close();
             connection.close();
         }catch (SQLException e) {
-            value = null;
             JOptionPane.showMessageDialog(new JPanel(),"Ошибка получения данных с БД\n"+e);
         }
-        return value;
+        return nameOfCSV;
 
     }
 
@@ -520,10 +523,11 @@ public final class RS extends GridBagConstraints {
         }
 
         FileNameExtensionFilter filter = new FileNameExtensionFilter(fileFilter,ff);
+        fileChooser.setFileFilter(filter);
         fileChooser.setDialogTitle(dialog);
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fileChooser.showOpenDialog(null);
-        //fileChooser.setFileFilter(filter);
+
         String string ="";
         //if (fileChooser.showOpenDialog(JFileChooser.APPROVE_OPTION)=="open")
         return fileChooser.getSelectedFile().getAbsolutePath();

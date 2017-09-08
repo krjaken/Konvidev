@@ -1,16 +1,9 @@
-import com.sun.xml.internal.bind.v2.runtime.reflect.opt.MethodAccessor_Long;
-
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.text.MaskFormatter;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.lang.invoke.LambdaMetafactory;
-import java.lang.reflect.Method;
 import java.text.ParseException;
-import java.util.function.Function;
-import java.util.function.UnaryOperator;
 
 public class Settings extends JPanel {
     private JLabel jlURLkukrs = new JLabel();
@@ -25,10 +18,10 @@ public class Settings extends JPanel {
 
     private JButton jbSaveURL = new JButton("Изменить URL загрузки курсов");
     private JButton jbFEE = new JButton("Изменить % FEE");
-    private JButton jbTenancy = new JButton("Изменить стоимость аренды оборудования (руб)");
-    private JButton jbTechSupport = new JButton("Изменить стоимость Техподдержки (руб)");
-    private JButton jbKlientSupport = new JButton("Изменить стоимость Клиентской поддержки (руб)");
-    private JButton jbRiskM = new JButton("Изменить стоимость Риск менеджмента (руб)");
+    private JButton jbTenancy = new JButton("Изменить стоимость аренды оборудования");
+    private JButton jbTechSupport = new JButton("Изменить стоимость Техподдержки");
+    private JButton jbKlientSupport = new JButton("Изменить стоимость Клиентской поддержки");
+    private JButton jbRiskM = new JButton("Изменить стоимость Риск менеджмента");
     private JButton jbAnalitik = new JButton("Изменить стоимость Аналитики (руб)");
     private JButton jbTesting = new JButton("Изменить стоимость тестирования (руб)");
     private JButton jbDevelopment = new JButton("Изменить стоимость разработки (руб)");
@@ -72,28 +65,28 @@ public class Settings extends JPanel {
         jbTenancy.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                RS.setTenancy(JOptionPane.showInputDialog("Введите стоимость аренды оборудования (руб)"),Settings.this);
+                RS.setTenancy(JOptionPane.showInputDialog("Введите стоимость аренды оборудования"),Settings.this);
                 jlTenancy.setText(RS.getTenancy(Settings.this));
             }
         });
         jbTechSupport.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                RS.setTechSupport(JOptionPane.showInputDialog("Введите стоимость технической поддержки (руб)"),Settings.this);
+                RS.setTechSupport(JOptionPane.showInputDialog("Введите стоимость технической поддержки"),Settings.this);
                 jlTechSupport.setText(RS.getTechSupport(Settings.this));
             }
         });
         jbKlientSupport.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                RS.setKlientSupport(JOptionPane.showInputDialog("Введите стоимость клиентской поддуржки (руб)"),Settings.this);
+                RS.setKlientSupport(JOptionPane.showInputDialog("Введите стоимость клиентской поддуржки"),Settings.this);
                 jlKlientSupport.setText(RS.getKlientSupport(Settings.this));
             }
         });
         jbRiskM.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                RS.setRiskM(JOptionPane.showInputDialog("Введите стоимость Риск менеджмент(руб)"),Settings.this);
+                RS.setRiskM(JOptionPane.showInputDialog("Введите стоимость Риск менеджмент"),Settings.this);
                 jlRiskM.setText(RS.getRiskM(Settings.this));
             }
         });

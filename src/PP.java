@@ -2,13 +2,19 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.text.MaskFormatter;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.ParseException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+
 import static javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED;
 
 public class PP extends JPanel {
@@ -25,6 +31,7 @@ public class PP extends JPanel {
     private JPanel jpDownload = new JPanel(new GridBagLayout());
     private JPanel jpUpdate = new JPanel(new GridBagLayout());
     private JPanel jpOpering = new JPanel(new GridBagLayout());
+    JFrame mainFrame;
     String[][] konvidwvCSV;
     Set<String> listCurr;
     Double totalSummCalc=0.0;
@@ -37,6 +44,7 @@ public class PP extends JPanel {
     String[][] ActualKurrKonvers;
 
     public PP(JFrame mainFrame) throws ParseException {
+        this.mainFrame = mainFrame;
         setLayout(new GridBagLayout());
         Border etched = BorderFactory.createEtchedBorder();
         Border titled3 = BorderFactory.createTitledBorder(etched, "Доп. информация");
@@ -64,19 +72,7 @@ public class PP extends JPanel {
         jbDownloadCSV.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                try {
-                    konvidwvCSV = new ReadCSV().ReadCSV(RS.FifeChoose(mainFrame,"Загрузка CSV","","CSV","CSV")).clone();
-                    SelectSellers(konvidwvCSV);
-
-                    jbOpering.setVisible(true);
-                    jpOpering.setVisible(true);
-                } catch (IOException e1) {
-                    JOptionPane.showMessageDialog(mainFrame,"Ошибка загрузки файла");
-                }
-                jpDownload.removeAll();
-                jpDownload.add(new JLabel(new ImageIcon("imgOK.gif")));
-                mainFrame.revalidate();
-                mainFrame.repaint();
+                chooseTypeOfFileToDownload();
             }
         });
 
@@ -84,7 +80,7 @@ public class PP extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 try {
-                    Visual(new DownloadKUR().DownloadKUR(DateK.getText(),PP.this),mainFrame);
+                    Visual(new DownloadKUR().DownloadKUR(DateK.getText(),PP.this));
                     jpUpdate.removeAll();
                     jpUpdate.add(new JLabel(new ImageIcon("imgOK.gif")));
                     mainFrame.revalidate();
@@ -100,7 +96,7 @@ public class PP extends JPanel {
         jbOpering.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                Invoice(mainFrame);
+                Invoice();
             }
         });
 
@@ -124,8 +120,8 @@ public class PP extends JPanel {
         RS.addComponent(PP.this,jpKur,new Rectangle(1,0,1,1),GridBagConstraints.EAST,GridBagConstraints.VERTICAL);
     }
 
-//Метод предварительной обработки списка валют с дальнейшим вызовом Visual2(kurr,mainFrame), для прорисовки
-    public void Visual(String[][] kurr, JFrame mainFrame) {
+//Метод предварительной обработки списка валют с дальнейшим вызовом Visual2(kurr), для прорисовки
+    public void Visual(String[][] kurr) {
         for (int i = 0; i < kurr.length; i++) {
             jcKURR.addItem(kurr[i][2]);
         }
@@ -135,14 +131,14 @@ public class PP extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 jpSkroll.removeAll();
-                Visual2(kurr,mainFrame);
+                Visual2(kurr);
             }
         });
-        Visual2(kurr,mainFrame);
+        Visual2(kurr);
     }
 
 //Метод прорисовки и пересчета актуального курса конвертаци
-    private void Visual2(String[][] kurr, JFrame mainFrame){
+    private void Visual2(String[][] kurr){
         RS.addComponent(jpSkroll, jlKurr, new Rectangle(0, 0, 1, 1), GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL);
         RS.addComponent(jpSkroll, jcKURR, new Rectangle(1, 0, 2, 1), GridBagConstraints.WEST, GridBagConstraints.NONE);
         ActualKurrKonvers= new String[kurr.length+1][3];
@@ -204,7 +200,7 @@ public class PP extends JPanel {
         RS.addComponent(jpBasikDate,new JPanel(),new Rectangle(0,num+1,3,1),GridBagConstraints.EAST,GridBagConstraints.BOTH);
     }
 
-    private void Invoice(JFrame mainFrame){
+    private void Invoice(){
         String[][] sumInKur;
         String[][] invoice;
         JTable jtInvoice;
@@ -392,6 +388,59 @@ public class PP extends JPanel {
             td=0;
         }
         return td;
+    }
+    private void chooseTypeOfFileToDownload(){
+        JDialog dialog = new JDialog();
+        JPanel panel =new JPanel(new GridBagLayout());
+        JButton csvButton = new JButton("csv файл");
+        JButton xlsButton = new JButton("xls/xlsx файл");
+        csvButton.setPreferredSize(new Dimension(120, 30));
+        xlsButton.setPreferredSize(new Dimension(120, 30));
+
+        csvButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                try {
+                    konvidwvCSV = new ReadCSV().ReadCSV(RS.FifeChoose(mainFrame,"Загрузка CSV","","файлы CSV","CSV")).clone();
+                    SelectSellers(konvidwvCSV);
+
+                    jbOpering.setVisible(true);
+                    jpOpering.setVisible(true);
+                } catch (IOException e1) {
+                    JOptionPane.showMessageDialog(mainFrame,"Ошибка загрузки файла");
+                }
+                jpDownload.removeAll();
+                jpDownload.add(new JLabel(new ImageIcon("imgOK.gif")));
+                mainFrame.revalidate();
+                mainFrame.repaint();
+            }
+        });
+        xlsButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                new ModuleXLS();
+                //konvidwvCSV = new XlsXlsxReader().XlsXlsxReader(RS.FifeChoose(mainFrame,"Загрузка xls","","файлы exel","xls, xlsx"));
+                SelectSellers(konvidwvCSV);
+
+                jbOpering.setVisible(true);
+                jpOpering.setVisible(true);
+                jpDownload.removeAll();
+                jpDownload.add(new JLabel(new ImageIcon("imgOK.gif")));
+                mainFrame.revalidate();
+                mainFrame.repaint();
+            }
+        });
+
+        RS.addComponent(panel,csvButton,new Rectangle(0,0,1,1),GridBagConstraints.WEST,GridBagConstraints.NONE, new Insets(50,50,50,50));
+        RS.addComponent(panel,xlsButton,new Rectangle(1,0,1,1),GridBagConstraints.EAST,GridBagConstraints.NONE, new Insets(50,0,50,50));
+        dialog.setTitle("Выбор типа загруженого файла");
+        dialog.setSize(290,130);
+        dialog.setLocation(mainFrame.getX()-100,mainFrame.getY()-100);
+        dialog.setResizable(false);
+        dialog.setModal(true);
+        dialog.add(panel);
+        dialog.pack();
+        dialog.setVisible(true);
     }
 }
 class JChekbox extends JCheckBoxMenuItem{
